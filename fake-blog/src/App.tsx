@@ -4,6 +4,7 @@ import AuthProvider from 'react-auth-kit';
 import { ToastContainer } from 'react-toastify';
 import "react-toastify/ReactToastify.css"
 import { UserProvider } from './Context/userAuth';
+import { Outlet } from 'react-router-dom';
 
 function App() {
   // const [count, setCount] = useState(0)
