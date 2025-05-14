@@ -5,26 +5,28 @@ import { yupResolver } from '@hookform/resolvers/yup';
 
 type Props = {}
 
-type LoginFormsInputs = {
+type RegisterFormsInputs = {
     username: string;
+    email: string;
     password: string;
 };
 
 const validation = Yup.object().shape({
     username: Yup.string().required("Username is required"),
+    email: Yup.string().required("Email is required!"),
     password: Yup.string().required("Password is required!")
 });
 
-export default function LoginPage({}: Props) {
+export default function RegisterPage({}: Props) {
     
     const {loginUser} = useAuth();
     const {
         register, 
         handleSubmit, 
         formState: {errors}
-    } = useForm<LoginFormsInputs>({resolver: yupResolver(validation)});
+    } = useForm<RegisterFormsInputs>({resolver: yupResolver(validation)});
 
-    const handleLogin = (form: LoginFormsInputs)=> {
+    const handleLogin = (form: RegisterFormsInputs)=> {
         loginUser(form.username, form.password);
     }
 
@@ -38,7 +40,7 @@ export default function LoginPage({}: Props) {
                 className="mx-auto h-10 w-auto"
             />
             <h2 className="mt-10 text-center text-2xl/9 font-bold tracking-tight text-gray-900">
-                Sign in to your account
+                Welcome! Sign Up
             </h2>
             </div>
 
@@ -53,7 +55,6 @@ export default function LoginPage({}: Props) {
                     id="username"
                     type="text"
                     required
-                    autoComplete="email"
                     className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
                     {...register("username")}
                     />
@@ -62,15 +63,27 @@ export default function LoginPage({}: Props) {
                 </div>
 
                 <div>
+                <label htmlFor="email" className="flex text-sm/6 font-medium text-gray-900">
+                    Email
+                </label>
+                <div className="mt-2">
+                    <input
+                    id="email"
+                    type="email"
+                    required
+                    autoComplete="email"
+                    className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
+                    {...register("email")}
+                    />
+                    {errors.email ? <p>{errors.email.message}</p> : ""}
+                </div>
+                </div>
+
+                <div>
                 <div className="flex items-center justify-between">
                     <label htmlFor="password" className="block text-sm/6 font-medium text-gray-900">
                     Password
                     </label>
-                    <div className="text-sm">
-                    <a href="#" className="font-semibold text-indigo-600 hover:text-indigo-500">
-                        Forgot password?
-                    </a>
-                    </div>
                 </div>
                 <div className="mt-2">
                     <input
@@ -90,15 +103,15 @@ export default function LoginPage({}: Props) {
                     type="submit"
                     className="flex w-full justify-center rounded-md bg-indigo-600 px-3 py-1.5 text-sm/6 font-semibold text-white shadow-xs hover:bg-indigo-500 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
                 >
-                    Sign in
+                    Sign Up
                 </button>
                 </div>
             </form>
 
             <p className="mt-10 text-center text-sm/6 text-gray-500">
-                Not a member?{' '}
-                <a href="register" className="font-semibold text-indigo-600 hover:text-indigo-500">
-                Sign Up
+                You are alredy a member?{' '}
+                <a href="login" className="font-semibold text-indigo-600 hover:text-indigo-500">
+                Sign In
                 </a>
             </p>
             </div>
