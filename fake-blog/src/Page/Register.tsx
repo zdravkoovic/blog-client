@@ -1,5 +1,5 @@
 import * as Yup from "yup";
-import { useAuth } from '../Context/userAuth';
+import { userAuth } from '../Context/userAuth';
 import { useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 
@@ -19,7 +19,7 @@ const validation = Yup.object().shape({
 
 export default function RegisterPage({}: Props) {
     
-    const {loginUser} = useAuth();
+    const {loginUser} = userAuth();
     const {
         register, 
         handleSubmit, 

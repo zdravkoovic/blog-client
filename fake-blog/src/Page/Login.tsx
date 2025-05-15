@@ -1,5 +1,5 @@
 import * as Yup from "yup";
-import { useAuth } from '../Context/userAuth';
+import { userAuth } from '../Context/userAuth';
 import { useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 
@@ -17,7 +17,7 @@ const validation = Yup.object().shape({
 
 export default function LoginPage({}: Props) {
     
-    const {loginUser} = useAuth();
+    const {loginUser} = userAuth();
     const {
         register, 
         handleSubmit, 
@@ -43,7 +43,7 @@ export default function LoginPage({}: Props) {
             </div>
 
             <div className="mt-10 sm:mx-auto sm:w-full sm:max-w-sm">
-            <form action="#" method="POST" className="space-y-6">
+            <form onSubmit={handleSubmit(handleLogin)} method="POST" className="space-y-6">
                 <div>
                 <label htmlFor="text" className="flex text-sm/6 font-medium text-gray-900">
                     Username

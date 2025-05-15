@@ -6,7 +6,7 @@ import type { UserToken } from "../Models/UserToken";
 export const loginAPI = async (username: string, password: string) => {
     try {
         const data= await axios.post<ResponseHelper<UserToken>>('/api/v1/auth/login', {
-            username: username,
+            email: username,
             password: password
         });
         return data;

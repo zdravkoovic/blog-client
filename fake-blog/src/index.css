@@ -1,2 +1,11 @@
 @import "tailwindcss";
-@import url("https://fonts.googleapis.com/css2?family=Poppins&family=Rubik&display=swap");
+
+#root{
+    padding: 10px !important;
+}
+
+.LoginBtn {
+    display: flex;
+    position: absolute;
+    right: 0;
+}

@@ -4,8 +4,3 @@ export type UserToken = {
     user: User;
     token: string;
 }
-
-export type UserProfile = {
-    username: string;
-    email: string;
-}

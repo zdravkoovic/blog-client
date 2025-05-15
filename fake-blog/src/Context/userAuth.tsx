@@ -1,12 +1,13 @@
 import React, { Children, createContext, useEffect, useState } from "react";
-import type { UserProfile } from "../Models/UserToken"
+import type { UserToken } from "../Models/UserToken"
 import { useNavigate } from "react-router-dom";
 import { loginAPI, registerAPI } from "../Services/AuthService";
 import { toast } from "react-toastify";
 import axios from "../components/axios";
+import type { User } from "../Models/User";
 
 type UserContextType = {
-    user: UserProfile | null;
+    user: User | null;
     token: string | null;
     registerUser: (email: string, username: string, password: string) => void;
     loginUser: (username: string, password: string) => void;
@@ -21,7 +22,7 @@ const UserContext = createContext<UserContextType>({} as UserContextType);
 export const UserProvider = ({children}: Props) => {
     const navigate = useNavigate();
     const [token, setToken] = useState<string | null>(null);
-    const [user, setUser] = useState<UserProfile | null>(null);
+    const [user, setUser] = useState<User | null>(null);
     const [isReady, setIsReady] = useState(false);
 
     useEffect(() => {
@@ -44,8 +45,10 @@ export const UserProvider = ({children}: Props) => {
             if(res) {
                 localStorage.setItem("token", res?.data.data.token);
                 const userObj = {
-                    username: res?.data.data.user.name,
-                    email: res?.data.data.user.email
+                    id: res?.data.data.user.id,
+                    name: res?.data.data.user.name,
+                    email: res?.data.data.user.email,
+                    avatar: res?.data.data.user.avatar
                 }
                 localStorage.setItem("user", JSON.stringify(userObj));
                 setToken(res?.data.data.token);
@@ -65,8 +68,10 @@ export const UserProvider = ({children}: Props) => {
                 if(res) {
                     localStorage.setItem("token", res?.data.data.token);
                     const userObj = {
-                        username: res?.data.data.user.name,
-                        email: res?.data.data.user.email
+                        id: res?.data.data.user.id,
+                        name: res?.data.data.user.name,
+                        email: res?.data.data.user.email,
+                        avatar: res?.data.data.user.avatar
                     }
                     localStorage.setItem("user", JSON.stringify(userObj));
                     setToken(res?.data.data.token);
@@ -97,4 +102,4 @@ export const UserProvider = ({children}: Props) => {
     );
 };
 
-export const useAuth = () => React.useContext(UserContext);
+export const userAuth = () => React.useContext(UserContext);
