@@ -1,5 +1,7 @@
 import axios from "../components/axios";
+import type { ResponseHelper } from "../Models/ResponseHelper";
 import type { Tag } from "./TagService";
+import slugify from 'react-slugify';
 
 export interface Blog{
     id: number;
@@ -16,11 +18,25 @@ export interface Blog{
         id: number;
         name: string;
         avatar_url: string;
+        role: string;
     }
     tags: Tag[];
+    
+    cover_image: string;
 }
 
 export async function getAllBlogs(): Promise<Blog[]>{
     const res = await axios.get('/api/v1/posts');
+    return res.data.data;
+}
+
+export async function createBlog(title: string, content: string, category_id: number, tag_ids: string[]): Promise<Blog> {
+    const res = await axios.post<ResponseHelper<Blog>>('api/v1/posts', {
+        title: title,
+        slug: slugify(title),
+        content: content,
+        category_id: category_id,
+        tag_ids: tag_ids
+    });
     return res.data.data;
 }

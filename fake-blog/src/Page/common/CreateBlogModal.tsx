@@ -6,13 +6,19 @@ import type React from 'react';
 import { useEffect, useState } from 'react';
 import CreatableSelect from 'react-select/creatable';
 import { tagContext } from '../../Context/tagContext';
+import { createBlog } from '../../Services/BlogService';
 
 interface CreateBlogModalProps {
     show: boolean,
     onHide: () => void;
 }
 
-interface Option { value: string; label: string; }
+const createOption = (label: string) : Option => ({
+  label,
+  value: label.toLowerCase().replace(/\W/g, ''),
+});
+
+interface Option { label: string; value: string; }
 
 const CreateBlogModal: React.FC<CreateBlogModalProps> = ({ show, onHide })=> {
   const [options, setOptions] = useState<Option[] | undefined>([
@@ -22,8 +28,12 @@ const CreateBlogModal: React.FC<CreateBlogModalProps> = ({ show, onHide })=> {
   ]);
 
   const { tags } = tagContext();
+  
+  const [ title, setTitle ] = useState('');
+  const [ content, setContent ] = useState('');
 
   const [value, setValue] = useState<Option[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     const newOptions = tags?.map(tag => ({
@@ -31,7 +41,34 @@ const CreateBlogModal: React.FC<CreateBlogModalProps> = ({ show, onHide })=> {
       value: tag.slug
     }));
     setOptions(newOptions);
+    if(tags?.length !== 0) 
+    {
+      setIsLoading(false);
+    }
   }, [tags])
+
+  const handleCreate = (inputValue: string) => {
+    setIsLoading(true);
+    setTimeout(() => {
+      const newOption = createOption(inputValue);
+      setIsLoading(false);
+      setOptions((prev) => [newOption, ...prev!]);
+      setValue((prev) => [newOption, ...prev]);
+    }, 1000);
+    console.log(value);
+  };
+
+  const handleTitleChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+      setTitle(e.target.value);
+  }
+
+  const handleContentChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    setContent(e.target.value);
+  }
+
+  const submit = () => {
+    const blog = createBlog(title, content, 1, value.map(o => o.value));
+  }
 
   return (
     <>
@@ -46,6 +83,7 @@ const CreateBlogModal: React.FC<CreateBlogModalProps> = ({ show, onHide })=> {
               <Form.Control
                 type="textarea"
                 placeholder="What are you thinking about?"
+                onChange={handleTitleChange}
                 autoFocus
               />
             </Form.Group>
@@ -56,7 +94,13 @@ const CreateBlogModal: React.FC<CreateBlogModalProps> = ({ show, onHide })=> {
                 options={options}
                 value={value}
                 placeholder="Choose a tag"
-                onChange={(newValue) => setValue(newValue as Option[])}
+                onChange={(newValue) => {
+                    setValue(newValue as Option[])
+                    console.log(value);
+                }}
+                onCreateOption={handleCreate}
+                isLoading={isLoading}
+                isDisabled={isLoading}
               />
             </Form.Group>
             <Form.Group
@@ -64,7 +108,10 @@ const CreateBlogModal: React.FC<CreateBlogModalProps> = ({ show, onHide })=> {
               controlId="exampleForm.ControlTextarea1"
             >
               <Form.Label>Content</Form.Label>
-              <Form.Control as="textarea" rows={3} maxLength={500} />
+              <Form.Control 
+                onChange={handleContentChange}
+                as="textarea" rows={3} maxLength={500}
+             />
             </Form.Group>
           </Form>
         </Modal.Body>
@@ -72,7 +119,7 @@ const CreateBlogModal: React.FC<CreateBlogModalProps> = ({ show, onHide })=> {
           <Button variant="secondary" onClick={onHide}>
             Close
           </Button>
-          <Button variant="primary">
+          <Button variant="primary" onClick={submit}>
             Save Changes
           </Button>
         </Modal.Footer>
