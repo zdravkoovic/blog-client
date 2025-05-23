@@ -5,6 +5,8 @@ import { ToastContainer } from 'react-toastify';
 import "react-toastify/ReactToastify.css"
 import { UserProvider } from './Context/userAuth';
 import { Outlet } from 'react-router-dom';
+import './Services/echo';
+import { TagProvider } from './Context/tagContext';
 
 function App() {
   // const [count, setCount] = useState(0)
@@ -19,7 +21,9 @@ function App() {
     <>
     <UserProvider>
       <AuthProvider store={store}>
-        <Outlet /> 
+        <TagProvider>
+          <Outlet /> 
+        </TagProvider>
       </AuthProvider>
       <ToastContainer />
     </UserProvider>

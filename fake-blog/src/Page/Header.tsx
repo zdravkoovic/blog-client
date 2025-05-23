@@ -1,13 +1,21 @@
 import { userAuth } from "../Context/userAuth"
-import { Disclosure, DisclosurePanel, Menu, MenuButton, MenuItem, MenuItems } from "@headlessui/react";
+import AddIcon from "@mui/icons-material/Add"
+import { Disclosure, Menu, MenuButton, MenuItem, MenuItems } from "@headlessui/react";
+import { useState } from "react";
+import CreateBlogModal from "./common/CreateBlogModal";
 
 type Props = {}
 
 export default function Header({}: Props) {
-  const { isLoggedIn, user } = userAuth();
+  const { isLoggedIn, user, logout } = userAuth();
+
+  const [ showCreateBlog, setShowCreateBlog ] = useState(false);
+  const openModal = () => setShowCreateBlog(true);
+  const closeModal = () => setShowCreateBlog(false);
 
   return (
     <>
+      <CreateBlogModal show={showCreateBlog} onHide={closeModal}/>
       { !isLoggedIn() ? (
       <div className="bg-grape py-24 sm:py-32">
           <div className="mx-auto max-w-7xl px-6 lg:px-8">
@@ -17,7 +25,7 @@ export default function Header({}: Props) {
               </div>
           </div>
       </div>) : (
-        <Disclosure as="nav" className="bg-blue-800">
+        <Disclosure as="nav" className="bg-blue-400">
       <div className="mx-auto max-w-7xl px-2 sm:px-6 lg:px-8">
         <div className="relative flex h-16 items-center justify-between">
           <div className="absolute inset-y-0 left-0 flex items-center sm:hidden">
@@ -56,13 +64,13 @@ export default function Header({}: Props) {
             {/* Profile dropdown */}
             <Menu as="div" className="relative ml-3">
               <div>
-                <MenuButton className="relative flex rounded-full bg-gray-800 text-sm focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-800 focus:outline-hidden">
-                  <span className="absolute -inset-1.5" />
-                  <span className="sr-only">Open user menu</span>
+                <MenuButton className="menuButton relative flex rounded-full bg-gray-800 text-sm focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-800 focus:outline-hidden">
+                  {/* <span className="absolute -inset-1.5" />
+                  <span className="sr-only">Open user menu</span> */}
                   <img
                     alt=""
-                    src={user?.avatar}
-                    className="size-8 rounded-full"
+                    src={user?.avatar_url}
+                    className="size-11 rounded-full"
                   />
                 </MenuButton>
               </div>
@@ -72,10 +80,11 @@ export default function Header({}: Props) {
               >
                 <MenuItem>
                   <a
-                    href="#"
-                    className="block px-4 py-2 text-sm text-gray-700 data-focus:bg-gray-100 data-focus:outline-hidden"
+                    onClick={openModal}
+                    className="select-none block px-4 py-2 text-sm text-gray-700 data-focus:bg-gray-100 data-focus:outline-hidden"
                   >
-                    Your Profile
+                    <AddIcon />
+                    Create blog
                   </a>
                 </MenuItem>
                 <MenuItem>
@@ -88,6 +97,7 @@ export default function Header({}: Props) {
                 </MenuItem>
                 <MenuItem>
                   <a
+                    onClick={logout}
                     href="#"
                     className="block px-4 py-2 text-sm text-gray-700 data-focus:bg-gray-100 data-focus:outline-hidden"
                   >

@@ -1,5 +1,4 @@
-import React, { Children, createContext, useEffect, useState } from "react";
-import type { UserToken } from "../Models/UserToken"
+import React, { createContext, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { loginAPI, registerAPI } from "../Services/AuthService";
 import { toast } from "react-toastify";
@@ -48,7 +47,7 @@ export const UserProvider = ({children}: Props) => {
                     id: res?.data.data.user.id,
                     name: res?.data.data.user.name,
                     email: res?.data.data.user.email,
-                    avatar: res?.data.data.user.avatar
+                    avatar_url: res?.data.data.user.avatar_url
                 }
                 localStorage.setItem("user", JSON.stringify(userObj));
                 setToken(res?.data.data.token);
@@ -71,7 +70,7 @@ export const UserProvider = ({children}: Props) => {
                         id: res?.data.data.user.id,
                         name: res?.data.data.user.name,
                         email: res?.data.data.user.email,
-                        avatar: res?.data.data.user.avatar
+                        avatar_url: res?.data.data.user.avatar_url
                     }
                     localStorage.setItem("user", JSON.stringify(userObj));
                     setToken(res?.data.data.token);

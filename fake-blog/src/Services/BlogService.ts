@@ -1,4 +1,5 @@
 import axios from "../components/axios";
+import type { Tag } from "./TagService";
 
 export interface Blog{
     id: number;
@@ -9,11 +10,14 @@ export interface Blog{
     content: string;
     created_at: string;
     updated_at: string;
+    comment_count: number;
+    likes_count: number;
     author: {
         id: number;
         name: string;
-        avatar: string;
+        avatar_url: string;
     }
+    tags: Tag[];
 }
 
 export async function getAllBlogs(): Promise<Blog[]>{

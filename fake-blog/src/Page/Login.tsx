@@ -6,12 +6,12 @@ import { yupResolver } from '@hookform/resolvers/yup';
 type Props = {}
 
 type LoginFormsInputs = {
-    username: string;
+    email: string;
     password: string;
 };
 
 const validation = Yup.object().shape({
-    username: Yup.string().required("Username is required"),
+    email: Yup.string().required("Email is required"),
     password: Yup.string().required("Password is required!")
 });
 
@@ -25,7 +25,7 @@ export default function LoginPage({}: Props) {
     } = useForm<LoginFormsInputs>({resolver: yupResolver(validation)});
 
     const handleLogin = (form: LoginFormsInputs)=> {
-        loginUser(form.username, form.password);
+        loginUser(form.email, form.password);
     }
 
     return (
@@ -46,18 +46,18 @@ export default function LoginPage({}: Props) {
             <form onSubmit={handleSubmit(handleLogin)} method="POST" className="space-y-6">
                 <div>
                 <label htmlFor="text" className="flex text-sm/6 font-medium text-gray-900">
-                    Username
+                    Email address
                 </label>
                 <div className="mt-2">
                     <input
-                    id="username"
-                    type="text"
+                    id="email"
+                    type="email"
                     required
                     autoComplete="email"
                     className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
-                    {...register("username")}
+                    {...register("email")}
                     />
-                    {errors.username ? <p>{errors.username.message}</p> : ""}
+                    {errors.email ? <p>{errors.email.message}</p> : ""}
                 </div>
                 </div>
 
