@@ -7,6 +7,7 @@ import { useEffect, useState } from 'react';
 import CreatableSelect from 'react-select/creatable';
 import { tagContext } from '../../Context/tagContext';
 import { createBlog } from '../../Services/BlogService';
+import Dialog from './Dialog';
 
 interface CreateBlogModalProps {
     show: boolean,
@@ -31,6 +32,16 @@ const CreateBlogModal: React.FC<CreateBlogModalProps> = ({ show, onHide })=> {
   
   const [ title, setTitle ] = useState('');
   const [ content, setContent ] = useState('');
+
+  const [confirm, setConfirm] = useState(false);
+  const handleAgree= () =>{
+    const blog = createBlog(title, content, 1, value.map(o => o.value));
+    setConfirm(false);
+    onHide();
+  }
+  const handleDissagree = () => {
+    setConfirm(false);
+  }
 
   const [value, setValue] = useState<Option[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -67,14 +78,15 @@ const CreateBlogModal: React.FC<CreateBlogModalProps> = ({ show, onHide })=> {
   }
 
   const submit = () => {
-    const blog = createBlog(title, content, 1, value.map(o => o.value));
+    setConfirm(true);
   }
 
   return (
     <>
+      {confirm && <Dialog open={confirm} handleAgree={handleAgree} handleDisagree={handleDissagree}/>}
       <Modal show={show} onHide={onHide}>
         <Modal.Header closeButton>
-          <Modal.Title>Modal heading</Modal.Title>
+          <Modal.Title>BlogsBlogs</Modal.Title>
         </Modal.Header>
         <Modal.Body>
           <Form>

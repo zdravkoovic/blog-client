@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react"
+import { useEffect, useRef, useState } from "react"
 import { getAllBlogs, type Blog } from "../Services/BlogService";
 import { formatDate } from "../Services/DateService";
 import Spinner from "./common/Spinner";
@@ -16,11 +16,24 @@ export default function BlogsPage({}: Props){
     const [blogs, setBlogs] = useState<Blog[]>([]);
     const [loading, setLoading] = useState(true);
 
+    const [currentPage, setCurrentPage] = useState(1);
+    const [lastPage, setLastPage] = useState(1);
+
+    const loadMoreRef = useRef<HTMLDivElement>(null);
+
     useEffect(() => {
-        getAllBlogs().then(data => {
-            setBlogs(data);
+        const fetchBlogs = async (page = 1) => {
+            const res = await getAllBlogs(page);
+            const {data, current_page, last_page} = res;
+
+            setBlogs(prev => (page === 1) ? data : [...prev, ...data]);
+            setCurrentPage(current_page);
+            setLastPage(last_page);
             setLoading(false);
-        });
+        }
+
+        fetchBlogs(1);
+
         const channel = window.Echo.channel('posts');
 
         const handler = (e: BlogChannel) => {
@@ -38,9 +51,42 @@ export default function BlogsPage({}: Props){
         }
     }, [])
 
-    if(loading) return <Spinner />;
+    useEffect(() => {
+        if(!loadMoreRef.current) return;
+
+        const observer = new IntersectionObserver(
+            ([entry]) => {
+                if (
+                    entry.isIntersecting &&
+                    !loading &&
+                    currentPage < lastPage
+                ) {
+                    setLoading(true);
+                    getAllBlogs(currentPage + 1).then((res) => {
+                        const { data, current_page } = res;
+                        setBlogs(prev => [...prev, ...data]);
+                        setCurrentPage(current_page);
+                    })
+                    .finally(() => setLoading(false));
+                }
+            },
+            {
+                root: null,
+                rootMargin: '-100px',
+                threshold: 0.1,
+            }
+        );
+
+        observer.observe(loadMoreRef.current);
+
+        return () => {
+            observer.disconnect();
+        }
+    }, [currentPage, lastPage, loading])
+
 
     return (
+        <>
         <div className="blogs mx-auto mt-10 grid max-w-7xl grid-cols-1 gap-8 px-4 sm:grid-cols-2 lg:grid-cols-3">
             {blogs.map((blog) => (
             <article
@@ -119,6 +165,9 @@ export default function BlogsPage({}: Props){
         </div>
     </article>
     ))}
+    <div ref={loadMoreRef} />
     </div>
+    {loading && <Spinner />}
+    </>
     )
 }

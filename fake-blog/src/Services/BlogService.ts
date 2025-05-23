@@ -25,8 +25,14 @@ export interface Blog{
     cover_image: string;
 }
 
-export async function getAllBlogs(): Promise<Blog[]>{
-    const res = await axios.get('/api/v1/posts');
+export interface Paginate{
+    current_page: number,
+    data: Blog[]
+    last_page: number
+}
+
+export async function getAllBlogs(page: number): Promise<Paginate>{
+    const res = await axios.get(`/api/v1/posts?page=${page}`);
     return res.data.data;
 }
 

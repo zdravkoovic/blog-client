@@ -25,3 +25,10 @@ a {
     text-decoration: none !important;
     color: inherit !important;
 }
+
+.spinner {
+    display: flex;
+    width: 100%;
+    justify-content: center;
+    padding: 20px 0px 20px 0px;
+}
