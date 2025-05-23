@@ -2,6 +2,9 @@ import { useEffect, useState } from "react"
 import { getAllBlogs, type Blog } from "../Services/BlogService";
 import { formatDate } from "../Services/DateService";
 import Spinner from "./common/Spinner";
+import ThumbUp from '@mui/icons-material/ThumbUp';
+import ChatBubbleOutline from '@mui/icons-material/ChatBubbleOutline';
+
 
 type Props = {}
 
@@ -75,6 +78,16 @@ export default function BlogsPage({}: Props){
                         __html: blog.content
                     }}
                     ></p>
+                </div>
+                <div className="mt-4 flex items-center gap-x-4 text-sm text-gray-500">
+                    <div className="flex items-center gap-x-1">
+                        <ThumbUp fontSize="small" />
+                        <span>{blog.likes_count}</span>
+                    </div>
+                    <div className="flex items-center gap-x-1">
+                        <ChatBubbleOutline fontSize="small" />
+                        <span>{blog.comments_count}</span>
+                    </div>
                 </div>
                 <div className="relative mt-8 flex items-center gap-x-4">
                 <img alt="" src={blog.author.avatar_url} className="size-10 rounded-full bg-gray-50" />

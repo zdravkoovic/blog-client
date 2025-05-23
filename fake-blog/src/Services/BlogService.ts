@@ -10,7 +10,7 @@ export interface Blog{
     content: string;
     created_at: string;
     updated_at: string;
-    comment_count: number;
+    comments_count: number;
     likes_count: number;
     author: {
         id: number;
