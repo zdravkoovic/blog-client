@@ -72,7 +72,7 @@ export default function BlogsPage({}: Props){
             },
             {
                 root: null,
-                rootMargin: '-100px',
+                rootMargin: '0px',
                 threshold: 0.1,
             }
         );
@@ -89,10 +89,10 @@ export default function BlogsPage({}: Props){
         <>
         <div className="blogs mx-auto mt-10 grid max-w-7xl grid-cols-1 gap-8 px-4 sm:grid-cols-2 lg:grid-cols-3">
             {blogs.map((blog) => (
-            <article
-                key={blog.id}
-                className="flex flex-col justify-between bg-white dark:bg-gray-800 rounded-2xl shadow-md hover:shadow-lg transition-shadow duration-300 overflow-hidden"
-            >
+        <article
+            key={blog.id}
+            className="flex flex-col justify-between bg-white dark:bg-gray-800 rounded-2xl shadow-md hover:shadow-lg transition-shadow duration-300 overflow-hidden"
+        >
         {/* Opcionalna cover slika */}
         {blog.cover_image && (
         <img
@@ -123,6 +123,7 @@ export default function BlogsPage({}: Props){
             <a href={blog.slug} className="hover:text-indigo-600 transition-colors">
             {blog.title}
             </a>
+            
         </h3>
 
         {/* Kratki sadržaj */}
