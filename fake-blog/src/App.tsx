@@ -7,26 +7,24 @@ import { UserProvider } from './Context/userAuth';
 import { Outlet } from 'react-router-dom';
 import './Services/echo';
 import { TagProvider } from './Context/tagContext';
+import Header from './Page/Header';
+import BlogsPage from './Page/Blogs';
 
 function App() {
   // const [count, setCount] = useState(0)
-  const store = createStore({
-    authName: '_auth',
-    authType: 'cookie',
-    cookieDomain: window.location.hostname,
-    cookieSecure: window.location.protocol === 'https:',
-  });
+  // const store = createStore({
+  //   authName: '_auth',
+  //   authType: 'cookie',
+  // });
 
   return (
     <>
-    <UserProvider>
-      <AuthProvider store={store}>
-        <TagProvider>
-          <Outlet /> 
-        </TagProvider>
-      </AuthProvider>
-      <ToastContainer />
-    </UserProvider>
+      <UserProvider>
+
+          <Outlet />
+        
+        <ToastContainer />
+      </UserProvider>
     </>
   );
 }

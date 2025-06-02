@@ -15,6 +15,10 @@ export default defineConfig({
     },
   },
   build: {
+    ssr: true,
+    rollupOptions: {
+      input: './server.js'
+    },
     manifest: true,
   }
 })

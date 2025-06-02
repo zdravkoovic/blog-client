@@ -3,6 +3,7 @@ import AddIcon from "@mui/icons-material/Add"
 import { Disclosure, Menu, MenuButton, MenuItem, MenuItems } from "@headlessui/react";
 import { useState } from "react";
 import CreateBlogModal from "./common/CreateBlogModal";
+import LoginBtn from "./common/LoginBtn";
 
 type Props = {}
 
@@ -13,11 +14,14 @@ export default function Header({}: Props) {
   const openModal = () => setShowCreateBlog(true);
   const closeModal = () => setShowCreateBlog(false);
 
+  
+
   return (
     <>
       <CreateBlogModal show={showCreateBlog} onHide={closeModal}/>
-      { !isLoggedIn() ? (
+      { isLoggedIn() ? (
       <div className="bg-grape py-24 sm:py-32">
+          {/* <LoginBtn /> */}
           <div className="mx-auto max-w-7xl px-6 lg:px-8">
               <div className="mx-auto max-w-2xl lg:mx-0">
                   <h2 className="text-4xl font-semibold tracking-tight text-pretty text-gray-900 sm:text-5xl">From the blog</h2>
