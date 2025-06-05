@@ -75,7 +75,12 @@ app.post('/login', async function(req, res){
       maxAge: 1000*60*60
     });
 
-    res.send(user);
+    res.cookie('id_token', JSON.stringify(user), {
+      sameSite: 'strict',
+      maxAge: 1000*60*60
+    })
+
+    return res.redirect('/');
   }
 });
 
@@ -86,6 +91,13 @@ app.use('*all', async (req, res) => {
 
     const { getAllBlogs } = await vite.ssrLoadModule('/src/Services/BlogService.ts');
     const blogs = await getAllBlogs();
+
+    let user = null;
+    
+    const id_token = req.cookies.id_token;
+    if(id_token){
+            
+    }
 
     /** @type {string} */
     let template

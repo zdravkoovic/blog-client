@@ -27,12 +27,10 @@ export default function LoginPage({}: Props) {
 
     const handleLogin = async (form: LoginFormsInputs)=> {
         // loginUser(form.email, form.password);
-        const data = await axiosSSR.post('/login', {
+        await axiosSSR.post('/login', {
             email: form.email,
             password: form.password
         });
-
-        
     }
 
     return (
