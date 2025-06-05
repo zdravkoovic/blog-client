@@ -2,6 +2,7 @@ import * as Yup from "yup";
 import { userAuth } from '../Context/userAuth';
 import { useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
+import axiosSSR from "../components/auth/axiosSSR";
 
 type Props = {}
 
@@ -24,8 +25,14 @@ export default function LoginPage({}: Props) {
         formState: {errors}
     } = useForm<LoginFormsInputs>({resolver: yupResolver(validation)});
 
-    const handleLogin = (form: LoginFormsInputs)=> {
-        loginUser(form.email, form.password);
+    const handleLogin = async (form: LoginFormsInputs)=> {
+        // loginUser(form.email, form.password);
+        const data = await axiosSSR.post('/login', {
+            email: form.email,
+            password: form.password
+        });
+
+        
     }
 
     return (

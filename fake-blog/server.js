@@ -1,5 +1,7 @@
 import fs from 'node:fs/promises'
 import express from 'express'
+import cookieParser from 'cookie-parser';
+import axios from 'axios';
 
 // Constants
 const isProduction = false;
@@ -31,6 +33,51 @@ if (!isProduction) {
   app.use(compression())
   app.use(base, sirv('./dist/client', { extensions: [] }))
 }
+
+function authMiddleware(req, res, next){
+  const token = req.cookies.access_token;
+  const isLoading = req.path === '/login';
+
+  if(!token && !isLoading){
+    return res.redirect('/login');
+  }
+
+  // if(token && isLoading){
+  //   return res.redirect('/');
+  // }
+
+  next();
+}
+
+app.use(cookieParser());
+
+app.use(express.json());
+
+app.use(authMiddleware);
+
+app.post('/login', async function(req, res){
+  const data = await axios.post('http://localhost:8000/api/v1/auth/login', {
+    email: req.body.email,
+    password: req.body.password
+  });
+
+  let status = data.data.status;
+  let user = data.data.data.user;
+  let token = data.data.data.token;
+
+  console.log(status);
+  
+  if(status === 200)
+  {
+    res.cookie('access_token', token, {
+      httpOnly: true,
+      sameSite: 'strict',
+      maxAge: 1000*60*60
+    });
+
+    res.send(user);
+  }
+});
 
 // Serve HTML
 app.use('*all', async (req, res) => {
