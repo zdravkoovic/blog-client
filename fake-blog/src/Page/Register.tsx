@@ -2,6 +2,7 @@ import * as Yup from "yup";
 import { userAuth } from '../Context/userAuth';
 import { useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
+import { Link } from "react-router-dom";
 
 type Props = {}
 
@@ -110,9 +111,9 @@ export default function RegisterPage({}: Props) {
 
             <p className="mt-10 text-center text-sm/6 text-gray-500">
                 You are alredy a member?{' '}
-                <a href="login" className="font-semibold text-indigo-600 hover:text-indigo-500">
+                <Link to="/login" className="font-semibold text-indigo-600 hover:text-indigo-500">
                 Sign In
-                </a>
+                </Link>
             </p>
             </div>
         </div>

@@ -5,12 +5,16 @@ import CreateBlogModal from "./common/CreateBlogModal";
 import { UserContext } from "../Context/userContext";
 import axiosSSR from "../components/auth/axiosSSR";
 import { useForm } from "react-hook-form";
+import { useNavigate } from "react-router-dom";
+import LoginBtn from "./common/LoginBtn";
 
 type Props = {}
 
 export default function Header({}: Props) {
   // const { isLoggedIn, user, logout } = userAuth();
   const user = useContext(UserContext);
+
+  const navigate = useNavigate();
 
   console.log(user);
 
@@ -33,7 +37,7 @@ export default function Header({}: Props) {
     const message = await axiosSSR.post('/logout', {}, {withCredentials: true});
     if(message.status === 200){
       console.log("Redirect");
-      window.location.href = '/login'
+      window.location.href = '/'
     }
   }
 
@@ -42,7 +46,7 @@ export default function Header({}: Props) {
       <CreateBlogModal show={showCreateBlog} onHide={closeModal}/>
       { !isLoggedIn() ? (
       <div className="bg-grape py-24 sm:py-32">
-          {/* <LoginBtn /> */}
+          <LoginBtn />
           <div className="mx-auto max-w-7xl px-6 lg:px-8">
               <div className="mx-auto max-w-2xl lg:mx-0">
                   <h2 className="text-4xl font-semibold tracking-tight text-pretty text-gray-900 sm:text-5xl">From the blog</h2>
@@ -104,21 +108,20 @@ export default function Header({}: Props) {
                 className="absolute right-0 z-10 mt-2 w-48 origin-top-right rounded-md bg-white py-1 shadow-lg ring-1 ring-black/5 transition focus:outline-hidden data-closed:scale-95 data-closed:transform data-closed:opacity-0 data-enter:duration-100 data-enter:ease-out data-leave:duration-75 data-leave:ease-in"
               >
                 <MenuItem>
-                  <a
+                  <button
                     onClick={openModal}
                     className="select-none block px-4 py-2 text-sm text-gray-700 data-focus:bg-gray-100 data-focus:outline-hidden"
                   >
-                    <AddIcon />
                     Create blog
-                  </a>
+                    <AddIcon className="ml-9"/>
+                  </button>
                 </MenuItem>
                 <MenuItem>
-                  <a
-                    href="#"
+                  <button
                     className="block px-4 py-2 text-sm text-gray-700 data-focus:bg-gray-100 data-focus:outline-hidden"
                   >
                     Settings
-                  </a>
+                  </button>
                 </MenuItem>
                 <MenuItem>
                 <form onSubmit={handleSubmit(handleLogout)} method="POST">

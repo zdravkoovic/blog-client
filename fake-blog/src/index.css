@@ -26,9 +26,8 @@ a {
     color: inherit !important;
 }
 
-.spinner {
+.loginBtnLoader{
     display: flex;
-    width: 100%;
     justify-content: center;
-    padding: 20px 0px 20px 0px;
+    align-items: center;
 }

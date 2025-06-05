@@ -37,12 +37,14 @@ export async function getAllBlogs(page: number): Promise<Paginate>{
 }
 
 export async function createBlog(title: string, content: string, category_id: number, tag_ids: string[]): Promise<Blog> {
-    const res = await axios.post<ResponseHelper<Blog>>('api/v1/posts', {
+    const res = await axios.post('http://localhost:5173/posts', {
         title: title,
         slug: slugify(title),
         content: content,
         category_id: category_id,
         tag_ids: tag_ids
+    }, {
+        withCredentials: true,
     });
     return res.data.data;
 }

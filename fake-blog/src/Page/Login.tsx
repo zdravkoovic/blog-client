@@ -3,6 +3,9 @@ import { userAuth } from '../Context/userAuth';
 import { useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import axiosSSR from "../components/auth/axiosSSR";
+import Spinner from "./common/Spinner";
+import { useState } from "react";
+import { Link } from "react-router-dom";
 
 type Props = {}
 
@@ -19,6 +22,8 @@ const validation = Yup.object().shape({
 export default function LoginPage({}: Props) {
     
     // const {loginUser} = userAuth();
+    const [loginClicked, setLoginClicked] = useState(false);
+
     const {
         register, 
         handleSubmit, 
@@ -27,6 +32,7 @@ export default function LoginPage({}: Props) {
 
     const handleLogin = async (form: LoginFormsInputs)=> {
         // loginUser(form.email, form.password);
+        setLoginClicked(true);
         const message = await axiosSSR.post('/login', {
             email: form.email,
             password: form.password
@@ -99,18 +105,23 @@ export default function LoginPage({}: Props) {
                 <div>
                 <button
                     type="submit"
-                    className="flex w-full justify-center rounded-md bg-indigo-600 px-3 py-1.5 text-sm/6 font-semibold text-white shadow-xs hover:bg-indigo-500 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+                    className="loginBtnLoader flex w-full justify-center rounded-md bg-indigo-600 px-3 py-1.5 text-sm/6 font-semibold text-white shadow-xs hover:bg-indigo-500 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
                 >
-                    Sign in
+                    <span>Sign in</span>
+                    {loginClicked && (
+                        <div className="ml-6">
+                            <Spinner />
+                        </div>
+                    )}
                 </button>
                 </div>
             </form>
 
             <p className="mt-10 text-center text-sm/6 text-gray-500">
                 Not a member?{' '}
-                <a href="register" className="font-semibold text-indigo-600 hover:text-indigo-500">
+                <Link to="/register" className="font-semibold text-indigo-600 hover:text-indigo-500">
                 Sign Up
-                </a>
+                </Link>
             </p>
             </div>
         </div>

@@ -15,13 +15,13 @@ interface BlogChannel {
 }
 
 export default function BlogsPage({}: Props){
-    // const [blogs, setBlogs] = useState<Blog[]>([]);
-    const blogs = useContext(BlogContext);
+    const initialBlogs : Blog[] = useContext(BlogContext);
+    const [blogs, setBlogs] = useState<Blog[]>(initialBlogs);
     
-    const [loading, setLoading] = useState(true);
+    const [loading, setLoading] = useState(false);
 
     const [currentPage, setCurrentPage] = useState(1);
-    const [lastPage, setLastPage] = useState(1);
+    const [lastPage, setLastPage] = useState(2);
 
     const loadMoreRef = useRef<HTMLDivElement>(null);
 
@@ -30,13 +30,14 @@ export default function BlogsPage({}: Props){
     //         const res = await getAllBlogs(page);
     //         const {data, current_page, last_page} = res;
 
-    //         setBlogs(prev => (page === 1) ? data : [...prev, ...data]);
-    //         setCurrentPage(current_page);
+    //         // setBlogs(prev => (page === 1) ? data : [...prev, ...data]);
+    //         blogs.concat(data);
     //         setLastPage(last_page);
     //         setLoading(false);
     //     }
-
-    //     fetchBlogs(1);
+        
+    //     // setCurrentPage(1);
+    //     // fetchBlogs(1);
 
     //     // const channel = window.Echo.channel('posts');
 
@@ -55,38 +56,40 @@ export default function BlogsPage({}: Props){
     //     // }
     // }, [])
 
-    // useEffect(() => {
-    //     if(!loadMoreRef.current) return;
+    useEffect(() => {
+        if(!loadMoreRef.current) return;
 
-    //     const observer = new IntersectionObserver(
-    //         ([entry]) => {
-    //             if (
-    //                 entry.isIntersecting &&
-    //                 !loading &&
-    //                 currentPage < lastPage
-    //             ) {
-    //                 setLoading(true);
-    //                 getAllBlogs(currentPage + 1).then((res) => {
-    //                     const { data, current_page } = res;
-    //                     setBlogs(prev => [...prev, ...data]);
-    //                     setCurrentPage(current_page);
-    //                 })
-    //                 .finally(() => setLoading(false));
-    //             }
-    //         },
-    //         {
-    //             root: null,
-    //             rootMargin: '-100px',
-    //             threshold: 0.1,
-    //         }
-    //     );
+        const observer = new IntersectionObserver(
+            ([entry]) => {
+                if (
+                    entry.isIntersecting &&
+                    !loading &&
+                    currentPage < lastPage
+                ) {
+                    setLoading(true);
+                    getAllBlogs(currentPage + 1).then((res) => {
+                        const { data, current_page, last_page } = res;
+                        setBlogs(prev => [...prev, ...data]); 
+                        console.log(data);
+                        setCurrentPage(current_page);
+                        setLastPage(last_page);
+                    })
+                    .finally(() => setLoading(false));
+                }
+            },
+            {
+                root: null,
+                rootMargin: '-15px',
+                threshold: 0.1,
+            }
+        );
 
-    //     observer.observe(loadMoreRef.current);
+        observer.observe(loadMoreRef.current);
 
-    //     return () => {
-    //         observer.disconnect();
-    //     }
-    // }, [currentPage, lastPage, loading])
+        return () => {
+            observer.disconnect();
+        }
+    }, [currentPage, lastPage, loading])
 
 
     return (
@@ -106,7 +109,7 @@ export default function BlogsPage({}: Props){
                         </time>
                         {blog.tags.map((tag) => (
                         <span
-                            key={useId()}
+                            key={tag.slug}
                             className="mb-1 mr-2 inline-block bg-indigo-100 text-indigo-800 text-[10px] font-medium px-2 py-1 rounded-full"
                         >
                             {tag.name}
@@ -157,7 +160,9 @@ export default function BlogsPage({}: Props){
             </article>
             ))}
             </div>
-            {/* {loading && <Spinner />} */}
+            <div ref={loadMoreRef} className="flex justify-around mt-55 mb-3">
+                {loading && <Spinner />}
+            </div>
         </>
     )
 }

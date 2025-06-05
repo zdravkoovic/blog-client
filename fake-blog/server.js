@@ -40,9 +40,9 @@ function authMiddleware(req, res, next){
 
   console.log(req.cookies.access_token);
 
-  if(!token && !isLoading){
-    return res.redirect('/login');
-  }
+  // if(!token && !isLoading){
+  //   return res.redirect('/login');
+  // }
 
   if(token && isLoading){
     return res.redirect('/');
@@ -90,6 +90,22 @@ app.post('/logout', (req, res) => {
     sameSite: 'strict'
   });
   return res.status(200).send('User is logged out!');
+});
+
+app.post('/posts', async (req, res) => {
+  const data = req.body;
+  try {
+    await axios.post('http://localhost:8000/api/v1/posts', data, {
+      headers: {
+        Authorization: `Bearer ${req.cookies.access_token}`
+      }
+    });
+
+    return res.redirect('/');
+
+  } catch (error) {
+    console.error(error);
+  }
 });
 
 // Serve HTML

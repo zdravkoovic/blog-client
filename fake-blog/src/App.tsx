@@ -19,12 +19,14 @@ function App() {
 
   return (
     <>
-      <UserProvider>
+      <TagProvider>
+        <UserProvider>
 
-          <Outlet />
-        
-        <ToastContainer />
-      </UserProvider>
+            <Outlet />
+          
+          <ToastContainer />
+        </UserProvider>
+      </TagProvider>
     </>
   );
 }
