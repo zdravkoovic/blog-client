@@ -1,25 +1,46 @@
-import { userAuth } from "../Context/userAuth"
 import AddIcon from "@mui/icons-material/Add"
 import { Disclosure, Menu, MenuButton, MenuItem, MenuItems } from "@headlessui/react";
-import { useState } from "react";
+import { useContext, useState } from "react";
 import CreateBlogModal from "./common/CreateBlogModal";
-import LoginBtn from "./common/LoginBtn";
+import { UserContext } from "../Context/userContext";
+import axiosSSR from "../components/auth/axiosSSR";
+import { useForm } from "react-hook-form";
 
 type Props = {}
 
 export default function Header({}: Props) {
-  const { isLoggedIn, user, logout } = userAuth();
+  // const { isLoggedIn, user, logout } = userAuth();
+  const user = useContext(UserContext);
+
+  console.log(user);
+
+  function isLoggedIn() { return user !== null }
+
+  const logout = async () => {
+    const message = await axiosSSR.post('/logout');
+
+    console.log(message);
+  }
 
   const [ showCreateBlog, setShowCreateBlog ] = useState(false);
   const openModal = () => setShowCreateBlog(true);
   const closeModal = () => setShowCreateBlog(false);
 
-  
+  const { handleSubmit } = useForm();
+
+  const handleLogout =  async () => {
+    console.log('Logout');
+    const message = await axiosSSR.post('/logout', {}, {withCredentials: true});
+    if(message.status === 200){
+      console.log("Redirect");
+      window.location.href = '/login'
+    }
+  }
 
   return (
     <>
       <CreateBlogModal show={showCreateBlog} onHide={closeModal}/>
-      { isLoggedIn() ? (
+      { !isLoggedIn() ? (
       <div className="bg-grape py-24 sm:py-32">
           {/* <LoginBtn /> */}
           <div className="mx-auto max-w-7xl px-6 lg:px-8">
@@ -100,13 +121,13 @@ export default function Header({}: Props) {
                   </a>
                 </MenuItem>
                 <MenuItem>
-                  <a
-                    onClick={logout}
-                    href="#"
-                    className="block px-4 py-2 text-sm text-gray-700 data-focus:bg-gray-100 data-focus:outline-hidden"
-                  >
-                    Sign out
-                  </a>
+                <form onSubmit={handleSubmit(handleLogout)} method="POST">
+                    <button
+                      className="block px-4 py-2 text-sm text-gray-700 data-focus:bg-gray-100 data-focus:outline-hidden"
+                    >
+                      Sign out
+                    </button>
+                </form>
                 </MenuItem>
               </MenuItems>
             </Menu>

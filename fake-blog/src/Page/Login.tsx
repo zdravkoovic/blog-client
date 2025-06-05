@@ -18,7 +18,7 @@ const validation = Yup.object().shape({
 
 export default function LoginPage({}: Props) {
     
-    const {loginUser} = userAuth();
+    // const {loginUser} = userAuth();
     const {
         register, 
         handleSubmit, 
@@ -27,10 +27,16 @@ export default function LoginPage({}: Props) {
 
     const handleLogin = async (form: LoginFormsInputs)=> {
         // loginUser(form.email, form.password);
-        await axiosSSR.post('/login', {
+        const message = await axiosSSR.post('/login', {
             email: form.email,
             password: form.password
+        }, {
+            withCredentials: true
         });
+        if(message.status === 200){
+            console.log(message.data);
+            window.location.href = '/';
+        }
     }
 
     return (

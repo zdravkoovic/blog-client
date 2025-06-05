@@ -3,8 +3,11 @@ import { BrowserRouter, createBrowserRouter, renderMatches, RouterProvider } fro
 import type { Blog } from "./Services/BlogService";
 import { BlogContext } from "./Context/blogContext";
 import { routeDefinitions } from "./Routes/Routes";
+import { UserContext } from "./Context/userContext";
+import type { User } from "./Models/User";
 
-const initialBlogs = (window as any).__INITIAL_BLOGS__ as Blog[] || []
+const initialBlogs = (window as any).__INITIAL_BLOGS__ as Blog[] || [];
+const user = (window as any).__USER__ as User || null;
 
 // console.group('🕵️ pre-hydration HTML')
 // console.log(document.getElementById('root')!.innerHTML)
@@ -14,7 +17,9 @@ const browserRouter = createBrowserRouter(routeDefinitions);
 
 ReactDOM.hydrateRoot(
     document.getElementById('root')!,
-      <BlogContext.Provider value={initialBlogs}>
-        <RouterProvider router={browserRouter} />
-      </BlogContext.Provider>
+    <UserContext.Provider value={user}>
+        <BlogContext.Provider value={initialBlogs}>
+          <RouterProvider router={browserRouter} />
+        </BlogContext.Provider>
+      </UserContext.Provider>
 )

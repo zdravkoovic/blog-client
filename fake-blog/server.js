@@ -38,13 +38,15 @@ function authMiddleware(req, res, next){
   const token = req.cookies.access_token;
   const isLoading = req.path === '/login';
 
+  console.log(req.cookies.access_token);
+
   if(!token && !isLoading){
     return res.redirect('/login');
   }
 
-  // if(token && isLoading){
-  //   return res.redirect('/');
-  // }
+  if(token && isLoading){
+    return res.redirect('/');
+  }
 
   next();
 }
@@ -64,8 +66,6 @@ app.post('/login', async function(req, res){
   let status = data.data.status;
   let user = data.data.data.user;
   let token = data.data.data.token;
-
-  console.log(status);
   
   if(status === 200)
   {
@@ -75,13 +75,21 @@ app.post('/login', async function(req, res){
       maxAge: 1000*60*60
     });
 
-    res.cookie('id_token', JSON.stringify(user), {
-      sameSite: 'strict',
-      maxAge: 1000*60*60
-    })
+    // res.cookie('id_token', JSON.stringify(user), {
+    //   sameSite: 'strict',
+    //   maxAge: 1000*60*60
+    // })
 
     return res.redirect('/');
   }
+});
+
+app.post('/logout', (req, res) => {
+  res.clearCookie('access_token', {
+    httpOnly: true,
+    sameSite: 'strict'
+  });
+  return res.status(200).send('User is logged out!');
 });
 
 // Serve HTML
@@ -94,10 +102,16 @@ app.use('*all', async (req, res) => {
 
     let user = null;
     
-    const id_token = req.cookies.id_token;
-    if(id_token){
-            
+    const access_token = req.cookies.access_token;
+    if(access_token){
+      user = await axios.get('http://localhost:8000/api/v1/me', {
+        headers: {
+          Authorization: `Bearer ${access_token}`
+        }
+      });       
     }
+
+    user = user?.data.data;
 
     /** @type {string} */
     let template
@@ -113,17 +127,23 @@ app.use('*all', async (req, res) => {
       render = (await import('./dist/server/entry-server.js')).render
     }
 
-    const rendered = await render(url, blogs.data)
+    const rendered = await render(url, blogs.data, user)
 
     const initialDataScript = 
       `<script>
         window.__INITIAL_BLOGS__ = ${JSON.stringify(blogs.data)};
       </script>`
 
+    const userScript = 
+      `<script>
+        window.__USER__ = ${JSON.stringify(user)};
+      </script>`
+
     const html = template
       .replace(`<!--app-head-->`, rendered.head ?? '')
       .replace(`<!--ssr-outlet-->`, rendered.html ?? '')
       .replace(`<!--initial-data-->`, initialDataScript)
+      .replace(`<!--user-->`, userScript)
 
     res.status(200).set({ 'Content-Type': 'text/html' }).send(html)
   } catch (e) {
