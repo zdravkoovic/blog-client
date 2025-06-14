@@ -5,7 +5,8 @@ const axiosSSR = axiosLib.create({
     timeout: 60000,
     headers: {
         Accept: "text/html"
-    }
+    },
+    withCredentials: true
 });
 
 export default axiosSSR;

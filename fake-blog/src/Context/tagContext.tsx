@@ -19,7 +19,6 @@ export const TagProvider = ({children}: Props) => {
                 getAllTags().then((res) => {
                     if(res){
                         setTags(res);
-                        console.log("Axios: ", res)
                     }
                 });
             } catch (error) {
@@ -28,8 +27,7 @@ export const TagProvider = ({children}: Props) => {
         }
 
         if(tags?.length === 0) {
-            console.log("Desio se load")
-            load().then(() => console.log(tags));
+            load();
         }
 
     }, [])

@@ -6,6 +6,8 @@ import ThumbUp from '@mui/icons-material/ThumbUp';
 import ChatBubbleOutline from '@mui/icons-material/ChatBubbleOutline';
 import { Link } from "react-router-dom";
 import { BlogContext } from "../Context/blogContext";
+import { UserContext } from "../Context/userContext";
+import SearchBar from "./common/SearchBar";
 
 
 type Props = {}
@@ -22,6 +24,8 @@ export default function BlogsPage({}: Props){
 
     const [currentPage, setCurrentPage] = useState(1);
     const [lastPage, setLastPage] = useState(2);
+
+    const user = useContext(UserContext);
 
     const loadMoreRef = useRef<HTMLDivElement>(null);
 
@@ -70,7 +74,6 @@ export default function BlogsPage({}: Props){
                     getAllBlogs(currentPage + 1).then((res) => {
                         const { data, current_page, last_page } = res;
                         setBlogs(prev => [...prev, ...data]); 
-                        console.log(data);
                         setCurrentPage(current_page);
                         setLastPage(last_page);
                     })
@@ -94,24 +97,29 @@ export default function BlogsPage({}: Props){
 
     return (
         <>
-            <div className="blogs mx-auto mt-10 grid max-w-7xl grid-cols-1 gap-8 px-4 sm:grid-cols-2 lg:grid-cols-3">
+            {user !== null &&
+                <div className="pt-30">
+                    <SearchBar />
+                </div> 
+            }
+            <div className="blogs dark:bg-[#0a0f2c] mx-auto mt-10 grid max-w-7xl grid-cols-1 gap-8 px-4 sm:grid-cols-2 lg:grid-cols-3">
             {blogs.map((blog) => (
             <article
                 key={blog.id}
-                className="flex flex-col justify-between bg-white dark:bg-gray-800 rounded-2xl shadow-md hover:shadow-lg transition-shadow duration-300 overflow-hidden"
+                className="flex flex-col justify-between dark:bg-gray-900 rounded-2xl shadow hover:shadow-lg transition-shadow duration-300 overflow-hidden border border-gray-200 dark:border-gray-800"
             >
                 <div className="p-6 flex flex-col flex-grow">
                     
                     {/* Datum i tagovi */}
-                    <div className="flex flex-wrap items-center text-xs text-gray-500 mb-3">
+                    <div className="flex flex-wrap items-center text-xs text-gray-500 dark:text-gray-400 mb-3">
                         <time dateTime={blog.updated_at} className="mr-4">
                         {formatDate(blog.updated_at)}
                         </time>
                         {blog.tags.map((tag) => (
                         <span
                             key={tag.slug}
-                            className="mb-1 mr-2 inline-block bg-indigo-100 text-indigo-800 text-[10px] font-medium px-2 py-1 rounded-full"
-                        >
+                            className="mb-1 mr-2 inline-block bg-indigo-100 text-indigo-800 dark:bg-yellow-600 dark:text-indigo-200 text-[10px] font-medium px-2 py-1 rounded-full"
+                            >
                             {tag.name}
                         </span>
                         ))}
@@ -119,39 +127,39 @@ export default function BlogsPage({}: Props){
 
 
                     {/* Naslov */}
-                    <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-2 line-clamp-2 group">
-                        <Link to={blog.slug} className="hover:text-indigo-600 transition-colors">
-                        {blog.title}
+                    <p className="text-3xl font-semibold  dark:text-white mb-2 line-clamp-2 group">
+                        <Link to={blog.slug} state={{blog: blog}} className="hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors">
+                            {blog.title}
                         </Link>
-                    </h3>
+                    </p>
 
                     {/* Kratki sadržaj */}
                     <p
-                        className="prose prose-sm prose-gray dark:prose-invert flex-grow mb-4 line-clamp-3"
+                        className="text-sm text-gray-700 dark:text-gray-300 bg-gray-100 dark:bg-white/5 p-3 rounded-md leading-relaxed line-clamp-3"
                         dangerouslySetInnerHTML={{ __html: blog.content }}
                     />
 
                     {/* Lajkovi i komentari */}
-                    <div className="mt-2 flex items-center gap-x-6 text-sm text-gray-500">
-                        <button className="flex items-center gap-x-1 hover:text-indigo-600 transition-colors">
+                    <div className="mt-auto flex items-center gap-x-6 text-sm text-gray-500 dark:text-gray-400">
+                        <button className="flex items-center gap-x-1 hover:text-pink-400 transition-colors">
                             <ThumbUp fontSize="small" />
                             <span>{blog.likes_count}</span>
                         </button>
-                        <button className="flex items-center gap-x-1 hover:text-indigo-600 transition-colors">
+                        <button className="flex items-center gap-x-1 hover:text-indigo-600 dark:hover:text-indigo-300 transition-colors">
                             <ChatBubbleOutline fontSize="small" />
                             <span>{blog.comments_count}</span>
                         </button>
                     </div>
 
                     {/* Podnožje: autor */}
-                    <div className="border-t border-gray-100 dark:border-gray-700 p-4 flex items-center">
+                    <div className="mt-auto border-t border-gray-100 dark:border-gray-700 pt-4 flex items-center">
                         <img
                             alt={blog.author.name}
                             src={blog.author.avatar_url}
-                            className="w-10 h-10 rounded-full mr-3 bg-gray-50"
+                            className="justify-center w-10 h-10 rounded-full mr-3 bg-gray-100 dark:bg-gray-800"
                         />
                         <div>
-                            <p className="text-sm font-medium text-gray-900 dark:text-gray-100">
+                            <p className="mb-0 flex justify-center text-gray-900 dark:text-gray-200">
                                 {blog.author.name}
                             </p>
                         </div>
@@ -160,7 +168,7 @@ export default function BlogsPage({}: Props){
             </article>
             ))}
             </div>
-            <div ref={loadMoreRef} className="flex justify-around mt-55 mb-3">
+            <div ref={loadMoreRef} className="dark:bg-[#0a0f2c] flex justify-around pt-55 pb-3">
                 {loading && <Spinner />}
             </div>
         </>

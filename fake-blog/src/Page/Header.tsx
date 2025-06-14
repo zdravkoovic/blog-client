@@ -1,12 +1,16 @@
 import AddIcon from "@mui/icons-material/Add"
+import SettingsIcon from "@mui/icons-material/Settings"
+import LogoutIcon from '@mui/icons-material/Logout';
 import { Disclosure, Menu, MenuButton, MenuItem, MenuItems } from "@headlessui/react";
 import { useContext, useState } from "react";
 import CreateBlogModal from "./common/CreateBlogModal";
 import { UserContext } from "../Context/userContext";
 import axiosSSR from "../components/auth/axiosSSR";
 import { useForm } from "react-hook-form";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import LoginBtn from "./common/LoginBtn";
+import { Avatar, AvatarImage } from "@/components/ui/avatar";
+import SettingsModal from "./common/Settings";
 
 type Props = {}
 
@@ -15,8 +19,6 @@ export default function Header({}: Props) {
   const user = useContext(UserContext);
 
   const navigate = useNavigate();
-
-  console.log(user);
 
   function isLoggedIn() { return user !== null }
 
@@ -29,6 +31,9 @@ export default function Header({}: Props) {
   const [ showCreateBlog, setShowCreateBlog ] = useState(false);
   const openModal = () => setShowCreateBlog(true);
   const closeModal = () => setShowCreateBlog(false);
+
+  const [showSettings, setShowSettings] = useState(false);
+  const openSettings = () => setShowSettings(true);
 
   const { handleSubmit } = useForm();
 
@@ -43,21 +48,26 @@ export default function Header({}: Props) {
 
   return (
     <>
+      {showSettings && <SettingsModal onClose={() => setShowSettings(false)}/>}
       <CreateBlogModal show={showCreateBlog} onHide={closeModal}/>
       { !isLoggedIn() ? (
-      <div className="bg-grape py-24 sm:py-32">
-          <LoginBtn />
-          <div className="mx-auto max-w-7xl px-6 lg:px-8">
-              <div className="mx-auto max-w-2xl lg:mx-0">
-                  <h2 className="text-4xl font-semibold tracking-tight text-pretty text-gray-900 sm:text-5xl">From the blog</h2>
-                  <p className="mt-2 text-lg/8 text-gray-600">Learn how to grow your business with our expert advice.</p>
+      <div className="relative h-screen bg-cover bg-center" style={{ backgroundImage: "url('./assets/background.jpg" }}>
+          <div className="absolute inset-0 bg-black/20 z-10"></div>
+        <div className="h-screen relative z-20 flex-1/3 content-center mx-auto max-w-7xl px-6 lg:px-8">
+              <div className="dark:text-gray-50 mx-auto max-w-2xl lg:mx-0" >
+                  <h2 className="text-4xl md:text-6xl font-bold text-white drop-shadow-lg">From the blog</h2>
+                  <p className="mt-4 text-lg md:text-xl text-gray-300 max-w-2xl">Learn how to grow your business with our expert advice.</p>
+              </div>
+              <div className="relative z-20 mt-20 px-6 py-3 font-medium rounded-lg transition-colors duration-200">
+                <LoginBtn />
               </div>
           </div>
       </div>) : (
-        <Disclosure as="nav" className="bg-blue-400">
+        <Disclosure as="nav" className="dark:bg-blue-950 fixed z-10 bg-blue-900 text-white shadow-md w-full">
       <div className="mx-auto max-w-7xl px-2 sm:px-6 lg:px-8">
         <div className="relative flex h-16 items-center justify-between">
-          <div className="absolute inset-y-0 left-0 flex items-center sm:hidden">
+
+          <div className=" absolute inset-y-0 left-0 flex items-center sm:hidden">
             {/* Mobile menu button */}
             {/* <DisclosureButton className="group relative inline-flex items-center justify-center rounded-md p-2 text-gray-400 hover:bg-gray-700 hover:text-white focus:ring-2 focus:ring-white focus:outline-hidden focus:ring-inset"> */}
               {/* <span className="absolute -inset-0.5" /> */}
@@ -68,11 +78,13 @@ export default function Header({}: Props) {
           </div>
           <div className="flex flex-1 items-center justify-center sm:items-stretch sm:justify-start">
             <div className="flex shrink-0 items-center">
-              {/* <img
-                alt="Your Company"
-                src="https://tailwindcss.com/plus-assets/img/logos/mark.svg?color=indigo&shade=500"
-                className="h-8 w-auto"
-              /> */}
+              <Link to='/'>
+                <img
+                  alt="Your Company"
+                  src="https://tailwindcss.com/plus-assets/img/logos/mark.svg?color=yellow&shade=500"
+                  className="h-8 w-auto"
+                />
+              </Link>
               {/* {user && <img alt="" src={user.avatar} className="size-10 rounded-full bg-gray-50" />} */}
             </div>
             <div className="hidden sm:ml-6 sm:block">
@@ -91,26 +103,27 @@ export default function Header({}: Props) {
             {/* </button> */} 
 
             {/* Profile dropdown */}
-            <Menu as="div" className="relative ml-3">
+             <div className="absolute inset-y-0 right-0 flex items-center pr-2 sm:static sm:inset-auto sm:ml-6 sm:pr-0">
+            <Menu as="div" className=" relative ml-3">
               <div>
-                <MenuButton className="menuButton relative flex rounded-full bg-gray-800 text-sm focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-800 focus:outline-hidden">
+                <MenuButton className="relative flex rounded-b-full text-sm focus:outline-none">
                   {/* <span className="absolute -inset-1.5" />
                   <span className="sr-only">Open user menu</span> */}
-                  <img
-                    alt=""
-                    src={user?.avatar_url}
-                    className="size-11 rounded-full"
-                  />
+                  <div className="flex items-center space-x-4 text-gray-600">
+                    <Avatar className="w-13 h-13 rounded-full overflow-hidden">
+                      <AvatarImage src={user?.avatar_url} className="object-cover w-full h-full"/>
+                    </Avatar>
+                  </div>
                 </MenuButton>
-              </div>
+                </div>
               <MenuItems
                 transition
-                className="absolute right-0 z-10 mt-2 w-48 origin-top-right rounded-md bg-white py-1 shadow-lg ring-1 ring-black/5 transition focus:outline-hidden data-closed:scale-95 data-closed:transform data-closed:opacity-0 data-enter:duration-100 data-enter:ease-out data-leave:duration-75 data-leave:ease-in"
+                className="dark:bg-blue-950 absolute right-0 z-10 mt-2 w-48 origin-top-right rounded-md bg-blue-800 py-1 shadow-lg ring-1 ring-yellow-400/50 transition focus:outline-none"
               >
                 <MenuItem>
                   <button
                     onClick={openModal}
-                    className="select-none block px-4 py-2 text-sm text-gray-700 data-focus:bg-gray-100 data-focus:outline-hidden"
+                    className="block w-full px-4 py-2 text-sm text-yellow-400 dark:hover:bg-blue-800 hover:text-white"
                   >
                     Create blog
                     <AddIcon className="ml-9"/>
@@ -118,22 +131,26 @@ export default function Header({}: Props) {
                 </MenuItem>
                 <MenuItem>
                   <button
-                    className="block px-4 py-2 text-sm text-gray-700 data-focus:bg-gray-100 data-focus:outline-hidden"
+                  onClick={openSettings}
+                    className="block w-full px-4 py-2 text-sm text-yellow-400 hover:bg-blue-700 hover:text-white"
                   >
                     Settings
+                    <SettingsIcon className="ml-15" />
                   </button>
                 </MenuItem>
                 <MenuItem>
                 <form onSubmit={handleSubmit(handleLogout)} method="POST">
                     <button
-                      className="block px-4 py-2 text-sm text-gray-700 data-focus:bg-gray-100 data-focus:outline-hidden"
+                      className="block w-full px-4 py-2 text-sm text-yellow-400 hover:bg-blue-700 hover:text-white"
                     >
                       Sign out
+                      <LogoutIcon className="ml-15" />
                     </button>
                 </form>
                 </MenuItem>
               </MenuItems>
             </Menu>
+            </div>
           </div>
         </div>
       </div>

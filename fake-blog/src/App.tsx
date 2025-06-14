@@ -4,7 +4,7 @@ import AuthProvider from 'react-auth-kit';
 import { ToastContainer } from 'react-toastify';
 import "react-toastify/ReactToastify.css"
 import { UserProvider } from './Context/userAuth';
-import { Outlet } from 'react-router-dom';
+import { Outlet, useLocation } from 'react-router-dom';
 import './Services/echo';
 import { TagProvider } from './Context/tagContext';
 import Header from './Page/Header';
@@ -17,13 +17,17 @@ function App() {
   //   authType: 'cookie',
   // });
 
+  const location = useLocation();
+  const currentPath = location.pathname;
+
   return (
     <>
       <TagProvider>
         <UserProvider>
-
+          {!currentPath.includes('/login') && !currentPath.includes('/register')
+            && <Header />
+          }
             <Outlet />
-          
           <ToastContainer />
         </UserProvider>
       </TagProvider>

@@ -90,22 +90,24 @@ const CreateBlogModal: React.FC<CreateBlogModalProps> = ({ show, onHide })=> {
     <>
       {confirm && <Dialog open={confirm} handleAgree={handleAgree} handleDisagree={handleDissagree}/>}
       <Modal show={show} onHide={onHide}>
-        <Modal.Header closeButton>
+          <div className="h-fit dark:bg-gray-900 dark:text-white bg-white text-black rounded-lg">
+        <Modal.Header closeButton className="dark:bg-gray-800 dark:text-white">
           <Modal.Title>BlogsBlogs</Modal.Title>
         </Modal.Header>
-        <Modal.Body>
+        <Modal.Body className="dark:bg-gray-900">
           <Form>
             <Form.Group className="mb-3" controlId="exampleForm.ControlInput1">
-              <Form.Label>Title</Form.Label>
+              <Form.Label className="dark:text-white">Title</Form.Label>
               <Form.Control
                 type="textarea"
                 placeholder="What are you thinking about?"
                 onChange={handleTitleChange}
                 autoFocus
+                className="dark:bg-gray-800 dark:text-white dark:border-gray-700"
               />
             </Form.Group>
             <Form.Group className="mb-3" controlId="exampleForm.ControlInput1">
-              <Form.Label>Tag</Form.Label>
+              <Form.Label className="dark:text-white">Tag</Form.Label>
               <CreatableSelect
                 isMulti
                 options={options}
@@ -124,7 +126,7 @@ const CreateBlogModal: React.FC<CreateBlogModalProps> = ({ show, onHide })=> {
               className="mb-3"
               controlId="exampleForm.ControlTextarea1"
             >
-              <Form.Label>Content</Form.Label>
+              <Form.Label className="dark:text-white">Content</Form.Label>
               <Form.Control 
                 onChange={handleContentChange}
                 as="textarea" rows={3} maxLength={500}
@@ -140,6 +142,7 @@ const CreateBlogModal: React.FC<CreateBlogModalProps> = ({ show, onHide })=> {
             Save Changes
           </Button>
         </Modal.Footer>
+      </div>
       </Modal>
     </>
   );

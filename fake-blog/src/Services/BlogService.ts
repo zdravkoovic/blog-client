@@ -1,5 +1,4 @@
 import axios from "../components/axios";
-import type { ResponseHelper } from "../Models/ResponseHelper";
 import type { Tag } from "./TagService";
 import slugify from 'react-slugify';
 
@@ -18,9 +17,9 @@ export interface Blog{
         id: number;
         name: string;
         avatar_url: string;
-        role: string;
     }
     tags: Tag[];
+    comments: Comment[];
     
     cover_image: string;
 }
@@ -47,4 +46,9 @@ export async function createBlog(title: string, content: string, category_id: nu
         withCredentials: true,
     });
     return res.data.data;
+}
+
+export async function DeleteBlog(commentId: number)
+{
+    await axios.delete('http://localhost:8000/delete_comment/'+commentId);
 }

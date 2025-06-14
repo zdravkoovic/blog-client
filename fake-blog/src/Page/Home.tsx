@@ -10,7 +10,6 @@ export default function HomePage({}: Props) {
   return (
     <>
         {!isLoggedIn() && <LoginBtn />}
-        <Header />
         <BlogsPage />
     </>
   )

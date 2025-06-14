@@ -3,7 +3,7 @@ import LoginPage from "../Page/Login";
 import RegisterPage from "../Page/Register";
 import Page404 from "../Page/404";
 import HomePage from "../Page/Home";
-import BlogPage from "../Page/Blog";
+import BlogPage from "../Page/BlogDetailes";
 
 export const routeDefinitions = [
   {

@@ -38,8 +38,6 @@ function authMiddleware(req, res, next){
   const token = req.cookies.access_token;
   const isLoading = req.path === '/login';
 
-  console.log(req.cookies.access_token);
-
   // if(!token && !isLoading){
   //   return res.redirect('/login');
   // }
@@ -105,6 +103,77 @@ app.post('/posts', async (req, res) => {
 
   } catch (error) {
     console.error(error);
+  }
+});
+
+app.get('/comments/:id', async (req, res) => {
+  const id = req.params.id;
+
+  try {
+    console.log("Odje je");
+    let comments = await axios.get('http://localhost:8000/api/v1/posts/comments/'+id,{
+      headers: {
+        Authorization: `Bearer ${req.cookies.access_token}`
+      }
+    });
+    comments = comments.data.data;
+    console.log(comments);
+    res.send(comments);
+  } catch (error) {
+    console.error(error)
+  }
+});
+
+app.post('/comment', async (req,res) => {
+  const data = req.body;
+
+  try {
+    let comment = await axios.post('http://localhost:8000/api/v1/posts/comment', data, {
+      headers: {
+        Authorization: `Bearer ${req.cookies.access_token}`
+      }
+    });
+    return res.status(200).send(comment.data.data);
+  } catch (error) {
+    console.error(error);
+  }
+});
+
+app.post('/like', async(req, res) => {
+  const blog_id = req.body;
+
+  try {
+    let like = await axios.post('http://localhost:8000/api/v1/posts/like', blog_id, {
+      headers: {
+        Authorization: `Bearer ${req.cookies.access_token}`
+      }
+    });
+    like = like.data.data;
+    return res.status(200).send(like);
+    
+  } catch (error) {
+    console.error(error);
+  }
+})
+
+app.delete('/comment/:id', async (req, res) => {
+  const id = req.params.id;
+
+  try {
+    const data = await axios.delete('http://localhost:8000/api/v1/posts/comments/' + id, {
+      headers: {
+        Authorization: `Bearer ${req.cookies.access_token}`
+      }
+    });
+    return res.send(data.data);
+  } catch (error) {
+    if (error.response) {
+      console.log('Error response status:', error.response.status);
+      return res.status(error.response.status).json(error.response.data);
+    } else {
+      console.log('Unknown error:', error.message);
+      return res.status(500).json({ message: 'Internal Server Error' });
+    }
   }
 });
 
