@@ -1,6 +1,7 @@
 // SettingsModal.tsx
 
 import React, { useState } from 'react';
+import ReactDOM from 'react-dom';
 import { Moon, Sun } from 'lucide-react';
 
 type Theme = 'light' | 'dark';
@@ -17,7 +18,7 @@ const SettingsModal: React.FC<{ onClose: () => void }> = ({ onClose }) => {
     setTheme(newTheme);
   };
 
-  return (
+  return ReactDOM.createPortal(
     <div className="fixed inset-0 flex items-center justify-center bg-black/50 z-50">
       <div className="bg-gray-50 dark:bg-gray-800 p-6 rounded-lg shadow-xl w-80 mx-auto">
         <p className="text-3xl font-semibold text-gray-900 dark:text-white mb-4">Settings</p>
@@ -47,7 +48,8 @@ const SettingsModal: React.FC<{ onClose: () => void }> = ({ onClose }) => {
           </button>
         </div>
       </div>
-    </div>
+    </div>,
+    document.body
   );
 };
 

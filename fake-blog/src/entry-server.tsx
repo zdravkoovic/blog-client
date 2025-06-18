@@ -6,6 +6,8 @@ import { BlogContext } from './Context/blogContext';
 import { routeDefinitions } from './Routes/Routes';
 import type { User } from './Models/User';
 import { UserContext } from './Context/userContext';
+import type { Category } from './Services/CategoryService';
+import { CategoryContext } from './Context/categoryContext';
 
 
 interface RenderResult {
@@ -16,7 +18,7 @@ interface RenderResult {
 /**
  * @param {string} _url
  */
-export async function render(_url: string, blogs: Blog[], user: User): Promise<RenderResult> {
+export async function render(_url: string, blogs: Blog[], categories: Category[], user: User): Promise<RenderResult> {
     
   _url = '/' + _url;
   const matches = matchRoutes(routeDefinitions as RouteObject[], _url, '/');
@@ -28,11 +30,13 @@ export async function render(_url: string, blogs: Blog[], user: User): Promise<R
 
   const html = renderToString(
     <UserContext.Provider value={user}>
+      <CategoryContext.Provider value={categories}>
       <BlogContext.Provider value={blogs}>
         <StaticRouter location={_url} basename='/'>
           {renderMatches(matches)}
         </StaticRouter>
       </BlogContext.Provider>
+      </CategoryContext.Provider>
   </UserContext.Provider>,
   )
   return { 

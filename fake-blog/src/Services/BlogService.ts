@@ -1,3 +1,4 @@
+import axiosSSR from "@/components/auth/axiosSSR";
 import axios from "../components/axios";
 import type { Tag } from "./TagService";
 import slugify from 'react-slugify';
@@ -13,6 +14,7 @@ export interface Blog{
     updated_at: string;
     comments_count: number;
     likes_count: number;
+    image_url: string;
     author: {
         id: number;
         name: string;
@@ -35,20 +37,28 @@ export async function getAllBlogs(page: number): Promise<Paginate>{
     return res.data.data;
 }
 
-export async function createBlog(title: string, content: string, category_id: number, tag_ids: string[]): Promise<Blog> {
-    const res = await axios.post('http://localhost:5173/posts', {
+export async function createBlog(title: string, content: string, category_id: number, tag_ids: string[]): Promise<number> {
+    const res = await axiosSSR.post('/posts', {
         title: title,
         slug: slugify(title),
         content: content,
         category_id: category_id,
         tag_ids: tag_ids
-    }, {
-        withCredentials: true,
     });
-    return res.data.data;
+    return res.status;
 }
 
 export async function DeleteBlog(commentId: number)
 {
     await axios.delete('http://localhost:8000/delete_comment/'+commentId);
+}
+
+export async function searchBlogs(query: string): Promise<Blog[]> {
+    try {
+        const response = await axios.get(`/api/v1/manticore/search?text=${encodeURIComponent(query)}`);
+        return response.data.data; 
+    } catch (error) {
+        console.error('Search error:', error);
+        return [];
+    }
 }

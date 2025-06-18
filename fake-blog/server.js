@@ -110,14 +110,12 @@ app.get('/comments/:id', async (req, res) => {
   const id = req.params.id;
 
   try {
-    console.log("Odje je");
     let comments = await axios.get('http://localhost:8000/api/v1/posts/comments/'+id,{
       headers: {
         Authorization: `Bearer ${req.cookies.access_token}`
       }
     });
     comments = comments.data.data;
-    console.log(comments);
     res.send(comments);
   } catch (error) {
     console.error(error)
@@ -185,6 +183,10 @@ app.use('*all', async (req, res) => {
     const { getAllBlogs } = await vite.ssrLoadModule('/src/Services/BlogService.ts');
     const blogs = await getAllBlogs();
 
+    const { getCategoryList } = await vite.ssrLoadModule('/src/Services/CategoryService.ts');
+    const categories = await getCategoryList();
+
+
     let user = null;
     
     const access_token = req.cookies.access_token;
@@ -212,11 +214,16 @@ app.use('*all', async (req, res) => {
       render = (await import('./dist/server/entry-server.js')).render
     }
 
-    const rendered = await render(url, blogs.data, user)
+    const rendered = await render(url, blogs.data, categories, user)
 
-    const initialDataScript = 
+    const blogsScript = 
       `<script>
         window.__INITIAL_BLOGS__ = ${JSON.stringify(blogs.data)};
+      </script>`
+
+    const categoriesScript = 
+      `<script>
+        window.__CATEGORIES__ = ${JSON.stringify(categories)};
       </script>`
 
     const userScript = 
@@ -227,7 +234,8 @@ app.use('*all', async (req, res) => {
     const html = template
       .replace(`<!--app-head-->`, rendered.head ?? '')
       .replace(`<!--ssr-outlet-->`, rendered.html ?? '')
-      .replace(`<!--initial-data-->`, initialDataScript)
+      .replace(`<!--initial-data-->`, blogsScript)
+      .replace(`<!--categories-->`, categoriesScript)
       .replace(`<!--user-->`, userScript)
 
     res.status(200).set({ 'Content-Type': 'text/html' }).send(html)

@@ -1,110 +1,178 @@
-import { useEffect, useState } from "react";
+import { useRef, useState, useEffect, useContext } from "react";
 import axios from "../../components/axios";
 import Spinner from "./Spinner";
+import { searchBlogs, type Blog } from "@/Services/BlogService";
+import SearchButton from "./SearchButton";
+import { SearchResultsContext } from "@/Context/searchResultsContext";
 
-type Props = {}
+type Props = {};
 
-const SearchBar = (props: Props) => {
-  const [showDropdown, setShowDropdown] = useState(false);
-  
+const SearchBar = ({}: Props) => {  
   const [spinner, setSpinner] = useState(true);
+  const [spinnerForSearching, setSpinnerForSearching] = useState(false);
   const [query, setQuery] = useState("");
-  const [recommends, setRecommends] = useState([]);
+  const [recommends, setRecommends] = useState<string[]>([]);
   const [showRecommends, setShowRecommends] = useState(false);
+  const [selectedIndex, setSelectedIndex] = useState<number>(-1);
+
+  const { setResults, setSearchLoading } = useContext(SearchResultsContext);
+
+  const debounceTimeout = useRef<NodeJS.Timeout | null>(null);
+  const listRefs = useRef<(HTMLLIElement | null)[]>([]);
+
+  const recommendsRef = useRef<HTMLUListElement>(null);
 
   const handleInputChenge = async (e : React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
     setQuery(value);
-    // setShowRecommends(true);
+    setSelectedIndex(-1);
+
+    if(debounceTimeout.current) clearTimeout(debounceTimeout.current);
+
     if(value.length < 4) {
       setRecommends([]);
-      // setShowRecommends(false);
       return;
     }
 
-    try {
-      setSpinner(true);
-      setShowRecommends(true);
-      const response = await axios.get('/api/v1/manticore/autocomplete/' + query);
-      setSpinner(false);
-      const data = response.data.data;
-
-      setRecommends(data);
-    } catch (error) {
-      console.error('Autocomplete error: ', error);
-      setRecommends([]);
-    }
+    debounceTimeout.current = setTimeout(async () => {
+      try {
+        setSpinner(true);
+        setShowRecommends(true);
+        const response = await axios.get('/api/v1/manticore/autocomplete/' + value);
+        setSpinner(false);
+        const data = response.data.data;
+        setRecommends(data);
+      } catch (error) {
+        console.error('Autocomplete error: ', error);
+        setRecommends([]);
+      }
+    }, 800);
   }
 
   const handleResultClick = (title: string) => {
     setQuery(title);
     setRecommends([]);
     setShowRecommends(false);
+    setSelectedIndex(-1);
   }
 
+  // Scroll into view when selectedIndex changes
+  useEffect(() => {
+    if (selectedIndex >= 0 && listRefs.current[selectedIndex]) {
+      listRefs.current[selectedIndex]?.scrollIntoView({ block: "nearest" });
+    }
+  }, [selectedIndex]);
+
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (!showRecommends || recommends.length === 0) return;
+
+    if (e.key === "ArrowDown") {
+      e.preventDefault();
+      setSelectedIndex((prev) => (prev < recommends.length - 1 ? prev + 1 : 0));
+    } else if (e.key === "ArrowUp") {
+      e.preventDefault();
+      setSelectedIndex((prev) => (prev > 0 ? prev - 1 : recommends.length - 1));
+    } else if (e.key === "Enter") {
+      if (selectedIndex >= 0 && selectedIndex < recommends.length) {
+        e.preventDefault();
+        handleResultClick(recommends[selectedIndex]);
+      }
+    } else if (e.key === "Escape") {
+      setShowRecommends(false);
+    }
+  };
+
+  useEffect(() => {
+  if (!showRecommends) return;
+  if (spinnerForSearching) setShowRecommends(false);
+  const handleClickOutside = (event: MouseEvent) => {
+    if (
+      recommendsRef.current &&
+      !recommendsRef.current.contains(event.target as Node)
+    ) {
+      setShowRecommends(false);
+    }
+  };
+
+  document.addEventListener("mousedown", handleClickOutside);
+  return () => document.removeEventListener("mousedown", handleClickOutside);
+}, [showRecommends, spinnerForSearching]);
+
   return (
-    <div className="dark:bg-[#0a0f2c]">
-        <form className="dark:bg-[#0a0f2c] max-w-lg mx-auto">
-          <div className="flex">
-              <label className="mb-2 text-sm font-medium text-gray-900 sr-only dark:text-white">Your Email</label>
-              <button 
-                onClick={() => setShowDropdown(!showDropdown)}
-                id="dropdown-button" data-dropdown-toggle="dropdown" className="shrink-0 z-0 inline-flex items-center py-2.5 px-4 text-sm font-medium text-center text-gray-900 bg-gray-100 border border-gray-300 rounded-s-lg hover:bg-gray-200 focus:ring-4 focus:outline-none focus:ring-gray-100 dark:bg-gray-700 dark:hover:bg-gray-600 dark:focus:ring-gray-700 dark:text-white dark:border-gray-600" type="button">
-                All categories
-                <svg className="w-2.5 h-2.5 ms-2.5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 10 6">
-                  <path stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="m1 1 4 4 4-4"/>
-                </svg>
-              </button>
-              {showDropdown &&
-                <div id="dropdown" className="absolute mt-5 z-10 bg-white divide-y divide-gray-100 rounded-lg shadow-sm w-44 dark:bg-gray-700">
-                  <ul className="py-2 text-sm text-gray-700 dark:text-gray-200" aria-labelledby="dropdown-button">
-                  <li>
-                      <button type="button" className="inline-flex w-full px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">Mockups</button>
-                  </li>
-                  <li>
-                      <button type="button" className="inline-flex w-full px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">Templates</button>
-                  </li>
-                  <li>
-                      <button type="button" className="inline-flex w-full px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">Design</button>
-                  </li>
-                  <li>
-                      <button type="button" className="inline-flex w-full px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">Logos</button>
-                  </li>
-                  </ul>
-                </div>
-              }
-                <div className="relative w-full flex">
-                  <div>
-                    <input 
-                      onChange={handleInputChenge}
-                      type="search" id="search-dropdown" className="block p-2.5 w-full z-20 text-sm text-gray-900 bg-gray-50 rounded-e-lg border-s-gray-50 border-s-2 border border-gray-300 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-s-gray-700  dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:border-blue-500" placeholder="Search by title" required />
-                    
-                    {showRecommends  && (
-                      <ul className="absolute mt-1 w-full bg-white border border-gray-300 rounded-md shadow-lg z-10 max-h-60 overflow-auto">
-                        {spinner && <Spinner />}
-                        {recommends.map((title, index) => (
-                          <li
-                            key={index}
-                            onClick={() => handleResultClick(title)}
-                            className="px-4 py-2 hover:bg-blue-100 cursor-pointer"
-                          >
-                            {title}
-                          </li>
-                        ))}
-                      </ul>
-                    )}
-                  </div>
-                    <button type="submit" className="relative p-2.5 text-sm font-medium text-white bg-blue-700 rounded-e-lg border border-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">
-                        <svg className="w-4 h-4" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 20 20">
-                            <path stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="m19 19-4-4m0-7A7 7 0 1 1 1 8a7 7 0 0 1 14 0Z"/>
-                        </svg>
-                        {/* <span className="sr-only">Search</span> */}
-                    </button>
-                </div>
-            </div>
-        </form>
-      </div>
-  )
+    <div className="dark:bg-[#0a0f2c] z-10">
+      <form
+        className="dark:bg-[#0a0f2c] max-w-lg mx-auto"
+        onSubmit={async (e) => {
+          e.preventDefault();
+          try {
+            setSpinnerForSearching(true);
+            setSearchLoading(true);
+            const response = await searchBlogs(query);
+            setSearchLoading(false);
+            setResults(response);
+            console.log('Search results:', response);
+            setSpinnerForSearching(false);
+          } catch (error) {
+            setSpinner(false);
+            console.error('Search error:', error);
+          }
+        }}
+      >
+        <div className="flex z-10 relative">
+          <div className="relative w-full flex">
+            <input
+              onChange={handleInputChenge}
+              onKeyDown={handleKeyDown}
+              autoComplete="off"
+              autoCorrect="off"
+              value={query}
+              type="search"
+              id="search-dropdown"
+              className="block p-2.5 w-96 h-10 z-10 text-sm text-gray-900 bg-gray-50 dark:bg-gray-700 dark:border-s-gray-700  dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:border-blue-500"
+              placeholder="Search by title"
+              required
+            />
+
+            {showRecommends && query.length > 3 && (
+              <>
+                <div
+                  className="fixed inset-0 z-10"
+                  onClick={() => setShowRecommends(false)}
+                  tabIndex={-1}
+                  aria-hidden="true"
+                />
+                <ul
+                  className="absolute left-0 right-0 z-20 mt-0.5 w-full bg-white border border-gray-300 rounded-md shadow-lg max-h-60 overflow-auto"
+                  ref={recommendsRef}
+                  style={{ top: "100%" }}
+                >
+                  {spinner && (
+                    <div className="flex items-center justify-center p-4">
+                      <Spinner />
+                    </div>
+                  )}
+                  {recommends.map((title, index) => (
+                    <li
+                      key={index}
+                      onClick={() => handleResultClick(title)}
+                      className={`px-4 py-2 text-black hover:bg-blue-100 cursor-pointer ${
+                        index === selectedIndex ? "bg-blue-100" : ""
+                      }`}
+                      ref={el => { listRefs.current[index] = el; }}
+                    >
+                      {title}
+                    </li>
+                  ))}
+                </ul>
+              </>
+            )}
+
+            <SearchButton spinner={spinnerForSearching}/>
+          </div>
+        </div>
+      </form>
+    </div>
+  );
 }
 
-export default SearchBar
+export default SearchBar;

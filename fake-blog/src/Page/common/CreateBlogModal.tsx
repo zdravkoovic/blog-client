@@ -36,10 +36,10 @@ const CreateBlogModal: React.FC<CreateBlogModalProps> = ({ show, onHide })=> {
   const [confirm, setConfirm] = useState(false);
   const handleAgree= async () =>{
     try {
-      const blog = await createBlog(title, content, 1, value.map(o => o.value));
-      if(blog !== undefined) window.location.href = '/';
       setConfirm(false);
       onHide(); 
+      const res = await createBlog(title, content, 1, value.map(o => o.value));
+      if(res === 200) window.location.href = '/';
     } catch (error) {
       console.error(error);
     }

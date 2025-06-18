@@ -23,13 +23,13 @@ export default function BlogPage({} : Props) {
   <div className="space-y-2">
     <p className="dark:text-white text-4xl font-bold">{blog.title}</p>
     <div className="flex items-center space-x-4 text-sm text-gray-600">
-      <Avatar>
-        <AvatarImage src={blog.author.avatar_url} />
+      <Avatar className="w-13 h-13">
+        <AvatarImage src={blog.author.avatar_url} className="rounded-full object-cover" />
       </Avatar>
-      <span className="dark:text-white">{blog.author.name}</span>
+      <span className="font-bold dark:text-white">{blog.author.name}</span>
       <span className="dark:text-white">·</span>
       <time dateTime={blog.updated_at} className="mr-4 dark:text-white">
-        {formatDate(blog.updated_at)}
+        {formatDate(blog.updated_at)} {new Date(blog.updated_at).toLocaleTimeString('sr-RS', { hour: '2-digit', minute: '2-digit' })}
       </time>
     </div>
   </div>

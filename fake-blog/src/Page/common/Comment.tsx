@@ -72,7 +72,7 @@ export default function Comments({blogId, comments_count, setCommentsCount}: Pro
     )}
 
   {/* Komentari */}
-<div className={`space-y-4 transition-opacity duration-500 ${visible ? "opacity-100" : "opacity-0"}`}>
+<div className={`space-y-4 min-w-lg transition-opacity duration-500 ${visible ? "opacity-100" : "opacity-0"}`}>
   {comments.map((comment) => (
     <div
       key={comment.id}
@@ -88,12 +88,12 @@ export default function Comments({blogId, comments_count, setCommentsCount}: Pro
 
       <div className="dark:bg-blue-950 flex flex-col w-full">
         <div className="flex justify-between items-start">
-          <div className="flex items-center gap-2">
-            <p className="text-sm font-semibold text-gray-900 dark:text-white">
+          <div className="flex justify-center content-center gap-2">
+            <p className="mb-0 text-sm font-semibold text-gray-900 dark:text-white">
               {comment.user_nickname}
             </p>
-            <span className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
-              · {formatDate(comment.updated_at)}
+            <span className="flex items-center text-xs text-gray-500 dark:text-gray-400 mt-0.5">
+              {formatDate(comment.updated_at)} {new Date(comment.updated_at).toLocaleTimeString('sr-RS', { hour: '2-digit', minute: '2-digit' })}
             </span>
           </div>
 
@@ -107,7 +107,7 @@ export default function Comments({blogId, comments_count, setCommentsCount}: Pro
               </button>
 
               {activeMenuId === comment.id && (
-                <div className="absolute right-0 z-10 mt-2 w-28  dark:bg-blue-900 shadow-md rounded-md py-1 text-sm">
+                <div className="absolute right-0 z-10 mt-2 w-28 bg-gray-50 dark:bg-blue-950 shadow-md rounded-md py-1 text-sm">
                   <button
                     onClick={() => {
                       handleEditComment(comment.id);
