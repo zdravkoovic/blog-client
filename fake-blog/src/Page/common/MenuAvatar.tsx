@@ -22,7 +22,7 @@ export default function MenuAvatar({}: Props) {
     const openSettings = () => setShowSettings(true);
 
     const handleLogout = async () => {
-        const message = await axiosSSR.post("/logout", {}, { withCredentials: true });
+        const message = await axiosSSR.post("/logout", {});
         if (message.status === 200) {
             window.location.href = "/";
         }
@@ -31,7 +31,7 @@ export default function MenuAvatar({}: Props) {
     return (
         <>
             {showSettings && <SettingsModal onClose={() => setShowSettings(false)} />}
-            <CreateBlogModal show={showCreateBlog} onHide={closeModal} />
+            {showCreateBlog && <CreateBlogModal show={showCreateBlog} onHide={closeModal} />}
             <Menu as="div" className="relative ml-3">
                 <div>
                     <MenuButton className="relative flex rounded-b-full text-sm focus:outline-none">
@@ -62,15 +62,13 @@ export default function MenuAvatar({}: Props) {
                         </button>
                     </MenuItem>
                     <MenuItem>
-                        <form onSubmit={handleSubmit(handleLogout)} method="POST" className="w-full">
-                            <button
-                                type="submit"
-                                className="text-gray-700 dark:text-gray-200 group flex w-full items-center px-4 py-2 text-sm hover:bg-gray-100 hover:dark:bg-blue-900 hover:text-gray-900 hover:dark:text-white"
-                            >
-                                <LogOutIcon className="mr-3 h-5 w-5" />
-                                Sign out
-                            </button>
-                        </form>
+                        <button
+                            onClick={handleLogout}
+                            className="text-gray-700 dark:text-gray-200 group flex w-full items-center px-4 py-2 text-sm hover:bg-gray-100 hover:dark:bg-blue-900 hover:text-gray-900 hover:dark:text-white"
+                        >
+                            <LogOutIcon className="mr-3 h-5 w-5" />
+                            Sign out
+                        </button>
                     </MenuItem>
                 </MenuItems>
             </Menu>

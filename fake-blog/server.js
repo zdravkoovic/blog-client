@@ -56,29 +56,33 @@ app.use(express.json());
 app.use(authMiddleware);
 
 app.post('/login', async function(req, res){
-  const data = await axios.post('http://localhost:8000/api/v1/auth/login', {
-    email: req.body.email,
-    password: req.body.password
-  });
-
-  let status = data.data.status;
-  let user = data.data.data.user;
-  let token = data.data.data.token;
-  
-  if(status === 200)
-  {
-    res.cookie('access_token', token, {
-      httpOnly: true,
-      sameSite: 'strict',
-      maxAge: 1000*60*60
-    });
-
-    // res.cookie('id_token', JSON.stringify(user), {
-    //   sameSite: 'strict',
-    //   maxAge: 1000*60*60
-    // })
-
-    return res.redirect('/');
+  try {
+      const data = await axios.post('http://localhost:8000/api/v1/auth/login', {
+        email: req.body.email,
+        password: req.body.password
+      });
+    
+      let status = data.status;
+      let token = data.data.data.token;
+      
+      if(status === 200)
+      {
+        res.cookie('access_token', token, {
+          httpOnly: true,
+          sameSite: 'strict',
+          maxAge: 1000*60*60
+        });
+    
+        return res.send(data.data);
+      }
+  } catch (error) {
+    if(error.response){
+      const {status, data} = error.response;
+      
+      if(status === 401){
+        return res.send(data);
+      }
+    }
   }
 });
 
@@ -179,9 +183,10 @@ app.delete('/comment/:id', async (req, res) => {
 app.use('*all', async (req, res) => {
   try {
     const url = req.originalUrl.replace(base, '')
+    const access_token = req.cookies.access_token;
 
     const { getAllBlogs } = await vite.ssrLoadModule('/src/Services/BlogService.ts');
-    const blogs = await getAllBlogs();
+    const blogs = await getAllBlogs(1, access_token);
 
     const { getCategoryList } = await vite.ssrLoadModule('/src/Services/CategoryService.ts');
     const categories = await getCategoryList();
@@ -189,7 +194,7 @@ app.use('*all', async (req, res) => {
 
     let user = null;
     
-    const access_token = req.cookies.access_token;
+    
     if(access_token){
       user = await axios.get('http://localhost:8000/api/v1/me', {
         headers: {

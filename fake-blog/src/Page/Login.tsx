@@ -1,11 +1,11 @@
 import * as Yup from "yup";
-import { userAuth } from '../Context/userAuth';
 import { useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import axiosSSR from "../components/auth/axiosSSR";
 import Spinner from "./common/Spinner";
 import { useState } from "react";
 import { Link } from "react-router-dom";
+import { toast } from "react-toastify";
 
 type Props = {}
 
@@ -36,12 +36,13 @@ export default function LoginPage({}: Props) {
         const message = await axiosSSR.post('/login', {
             email: form.email,
             password: form.password
-        }, {
-            withCredentials: true
         });
-        if(message.status === 200){
-            console.log(message.data);
+        if(message.data.status === 200){
             window.location.href = '/';
+        }
+        if(message.data.status === 401){
+            setLoginClicked(false);
+            toast.error(message.data.message);
         }
     }
 

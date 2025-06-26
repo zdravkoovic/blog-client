@@ -64,6 +64,37 @@ export default function Comments({blogId, comments_count, setCommentsCount}: Pro
 
   return (      
   <div className="space-y-6">
+
+    {/* Forma za novi komentar */}
+   <form
+  onSubmit={handleCommentSubmit}
+  className="p-6 bg-gray-50 dark:bg-inherit rounded-xl shadow-md transition-colors duration-200"
+>
+  <p className="text-lg font-semibold text-gray-800 dark:text-white mb-3">
+    Dodaj komentar
+  </p>
+
+  <textarea
+    placeholder="Napiši nešto..."
+    value={newComment}
+    onChange={(e) => setNewComment(e.target.value)}
+    className="w-full px-4 py-3 bg-gray-100 dark:bg-gray-700 text-gray-900 dark:text-white 
+               border-none rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none
+               resize-none min-h-[100px] transition-colors duration-200"
+  />
+  
+  <div className="flex justify-end mt-2">
+    <button
+      type="submit"
+      className="px-5 py-2 bg-blue-600 hover:bg-blue-700 text-white font-medium 
+                 rounded-lg transition-colors duration-200 focus:outline-none focus:ring-2 
+                 focus:ring-blue-500 focus:ring-offset-2"
+    >
+      Pošalji komentar
+    </button>
+  </div>
+</form>
+
     {/* Spinner dok traje učitavanje */}
     {loading && (
       <div className="flex justify-center py-6">
@@ -139,39 +170,6 @@ export default function Comments({blogId, comments_count, setCommentsCount}: Pro
     </div>
   ))}
 </div>
-
-
-
-
-    {/* Forma za novi komentar */}
-   <form
-  onSubmit={handleCommentSubmit}
-  className="p-6 bg-gray-50 dark:bg-inherit rounded-xl shadow-md transition-colors duration-200"
->
-  <p className="text-lg font-semibold text-gray-800 dark:text-white mb-3">
-    Dodaj komentar
-  </p>
-
-  <textarea
-    placeholder="Napiši nešto..."
-    value={newComment}
-    onChange={(e) => setNewComment(e.target.value)}
-    className="w-full px-4 py-3 bg-gray-100 dark:bg-gray-700 text-gray-900 dark:text-white 
-               border-none rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none
-               resize-none min-h-[100px] transition-colors duration-200"
-  />
-  
-  <div className="flex justify-end mt-2">
-    <button
-      type="submit"
-      className="px-5 py-2 bg-blue-600 hover:bg-blue-700 text-white font-medium 
-                 rounded-lg transition-colors duration-200 focus:outline-none focus:ring-2 
-                 focus:ring-blue-500 focus:ring-offset-2"
-    >
-      Pošalji komentar
-    </button>
-  </div>
-</form>
   </div>
   )
 }

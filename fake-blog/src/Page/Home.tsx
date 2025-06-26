@@ -11,6 +11,7 @@ import { CategoryContext } from "@/Context/categoryContext";
 import type { Category } from "@/Services/CategoryService";
 import { SearchResultsContext } from "@/Context/searchResultsContext";
 import { BlogSkeleton } from "./common/BlogSkeleton";
+import { useBlogStore } from "@/store/useBlogStore";
 
 type Props = {};
 
@@ -18,7 +19,7 @@ export default function HomePage({}: Props) {
   // Contexts
   const { isLoggedIn } = userAuth();
   const user = useContext(UserContext);
-  const initialBlogs: Blog[] = useContext(BlogContext);
+  const initialBlogs: Blog[] = useBlogStore(state => state.blogs);
   const categories: Category[] = useContext(CategoryContext);
   const { results, searchLoading } = useContext(SearchResultsContext);
 
@@ -27,6 +28,7 @@ export default function HomePage({}: Props) {
   const [loading, setLoading] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const [lastPage, setLastPage] = useState(2);
+  const [ready, setReady] = useState(false);
 
   // Refs
   const loadMoreRef = useRef<HTMLDivElement>(null);
@@ -45,10 +47,11 @@ export default function HomePage({}: Props) {
           setLoading(true);
           getAllBlogs(currentPage + 1)
             .then((res) => {
-              const { data, current_page, last_page } = res;
+              const { data, meta } = res;
               setBlogs((prev) => [...prev, ...data]);
-              setCurrentPage(current_page);
-              setLastPage(last_page);
+              useBlogStore.getState().appendBlogs(data);
+              setCurrentPage(meta.current_page);
+              setLastPage(meta.last_page);
             })
             .finally(() => setLoading(false));
         }
@@ -66,6 +69,19 @@ export default function HomePage({}: Props) {
       observer.disconnect();
     };
   }, [currentPage, lastPage, loading]);
+
+  useEffect(() => {
+    const scrollY = sessionStorage.getItem("scrollY");
+
+    if (scrollY) {
+      window.scrollTo(0, parseInt(scrollY, 10));
+      sessionStorage.removeItem("scrollY"); // Obavezno obriši da se ne ponavlja
+    }
+
+    setReady(true);
+  }, [])
+
+  if(!ready) return null;
 
   return (
     <div className="grid grid-cols-1 lg:grid-cols-3 gap-12 px-4 md:px-24 lg:px-56 mt-24">

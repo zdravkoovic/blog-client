@@ -1,12 +1,10 @@
 import axiosSSR from "@/components/auth/axiosSSR";
 import axios from "../components/axios";
-import type { Tag } from "./TagService";
 import slugify from 'react-slugify';
+import type { ResponseHelper } from "@/Models/ResponseHelper";
 
 export interface Blog{
     id: number;
-    user_id: number;
-    category_id: number;
     title: string;
     slug: string;
     content: string;
@@ -16,25 +14,25 @@ export interface Blog{
     likes_count: number;
     image_url: string;
     author: {
-        id: number;
         name: string;
         avatar_url: string;
     }
-    tags: Tag[];
-    comments: Comment[];
-    
+    tags: {
+        ids: number[];
+        names: string[];
+        slugs: string[];
+    };    
     cover_image: string;
+    did_user_like: boolean;
 }
 
-export interface Paginate{
-    current_page: number,
-    data: Blog[]
-    last_page: number
-}
-
-export async function getAllBlogs(page: number): Promise<Paginate>{
-    const res = await axios.get(`/api/v1/posts?page=${page}`);
-    return res.data.data;
+export async function getAllBlogs(page: number, token?: string): Promise<ResponseHelper<Blog[]>> {
+    const res = await axios.get(`/api/v1/posts?page=${page}`,{
+        headers: {
+            Authorization: token ? `Bearer ${token}` : "",
+        }
+    });
+    return res.data;
 }
 
 export async function createBlog(title: string, content: string, category_id: number, tag_ids: string[]): Promise<number> {
@@ -55,7 +53,7 @@ export async function DeleteBlog(commentId: number)
 
 export async function searchBlogs(query: string): Promise<Blog[]> {
     try {
-        const response = await axios.get(`/api/v1/manticore/search?text=${encodeURIComponent(query)}`);
+        const response = await axios.get(`/api/v1/posts/search?query=${encodeURIComponent(query)}`);
         return response.data.data; 
     } catch (error) {
         console.error('Search error:', error);

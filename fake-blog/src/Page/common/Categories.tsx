@@ -7,7 +7,6 @@ type Props = {
 };
 
 export default function Categories({categories}: Props) {
-    console.log("Categories component rendered with categories:", categories);
     const [selectedCategory, setSelectedCategory] = useState<Category | null>(null);
 
     const scrollRef = useRef<HTMLUListElement>(null);

@@ -1,6 +1,7 @@
 import axiosSSR from '@/components/auth/axiosSSR'
 import { Button } from '@/components/ui/button'
 import { handleError } from '@/Helpers/ErrorHandler'
+import { useBlogStore } from '@/store/useBlogStore'
 import { Heart } from 'lucide-react'
 import { useState } from 'react'
 import { toast } from 'react-toastify'
@@ -8,17 +9,25 @@ import { toast } from 'react-toastify'
 type Props = {
     lc: number,
     blogId: number,
+    likedByUser: boolean
 }
 
-export default function({lc, blogId}: Props) {
+export default function({lc, blogId, likedByUser}: Props) {
 
     const handleLike = async () => {
+        const newLiked = !liked;
+        const newLikesCount = liked ? likesCount - 1 : likesCount + 1;
         setLiked(!liked);
         setLikesCount((prev) => liked ? prev - 1 : prev + 1);
-
         try {
+            useBlogStore.getState().updateBlog(blogId, {
+                likes_count: newLikesCount,
+                did_user_like: newLiked
+            })
             const res = await axiosSSR.post("/like", {post_id: blogId});
-            if(res.status === 200) toast.success(`Blog is ${res.data}`);
+            if(res.status === 200) {
+                toast.success(`Blog is ${res.data === 1 ? "liked" : "unliked"}`);
+            }
             else toast.error("Something went wrong when you liked the blog");
         } catch (error) {
             setLiked(false);
@@ -28,7 +37,7 @@ export default function({lc, blogId}: Props) {
         }
     }
 
-    const [liked, setLiked] = useState(false);
+    const [liked, setLiked] = useState(likedByUser);
     const [likesCount, setLikesCount] = useState(lc);
 
   return (
