@@ -1,15 +1,77 @@
-import { useState, useRef, useContext } from "react";
-import { type Category } from "@/Services/CategoryService";
+import { useState, useRef, useContext, useEffect } from "react";
+import { getSavedBlogs, type Category } from "@/Services/CategoryService";
 import { CategoryContext } from "@/Context/categoryContext";
+import { SearchResultsContext } from "@/Context/searchResultsContext";
+import { useBlogStore } from "@/store/useBlogStore";
+import { UserContext } from "@/Context/userContext";
+import useSavedBlogs from "@/hooks/useSavedBlogs";
 
 type Props = {
     categories: Category[];
 };
 
+const all : Category = {id: -1, slug: 'all', name: 'all'}
+
 export default function Categories({categories}: Props) {
-    const [selectedCategory, setSelectedCategory] = useState<Category | null>(null);
+    const [selectedCategory, setSelectedCategory] = useState<Category>(() => {
+    const raw = sessionStorage.getItem('selectedCategory');
+        if (raw) {
+        try {
+            return JSON.parse(raw);
+        } catch {}
+        }
+        return all;
+    });
+
+    const [slug, setSlug] = useState(all.slug);
+
+    const user = useContext(UserContext);
+
+    const { data: filtered, isLoading, isError } = useSavedBlogs(user?.id ?? -1);
 
     const scrollRef = useRef<HTMLUListElement>(null);
+
+    const handleSelection = async(category: Category) => {
+
+        
+        let data;
+        setSlug(category.slug);
+        switch(category.slug){
+            case 'all':
+                useBlogStore.getState().clearFiltered();
+                break;
+            case 'saved':
+                data = filtered;
+                break;
+            default:
+                break;
+        }
+        
+        if(data !== undefined)
+        {
+            useBlogStore.getState().setFiltered(data);
+        }
+        
+    }
+
+    useEffect(() => {
+        const raw = sessionStorage.getItem('selectedCategory');
+        if(raw)
+        {
+            const category: Category = JSON.parse(raw);
+            setSelectedCategory(category);
+        }
+    }, []);
+
+    useEffect(() => {
+        if(slug === 'saved'){
+            useBlogStore.getState().setLoading(isLoading);
+        }
+    }, [isLoading, slug])
+
+    useEffect(() => {
+        sessionStorage.setItem('selectedCategory', JSON.stringify(selectedCategory));        
+    }, [selectedCategory]);
 
     return (
         <div className="w-full">
@@ -40,30 +102,37 @@ export default function Categories({categories}: Props) {
                         style={{ alignItems: "center", marginBottom: 0 }}
                     >
                         {/* All categories */}
-                        <li className="relative flex flex-col items-center justify-center h-full">
+                        <li 
+                            className="relative flex flex-col items-center justify-center h-full"
+                            onClick={() => handleSelection(all)}
+                        >
                             <span
                                 className={`cursor-pointer px-4 py-2 rounded-full transition-colors whitespace-nowrap select-none
-                                ${selectedCategory === null
+                                ${selectedCategory.slug === all.slug
                                 ? "text-blue-600 dark:text-yellow-600 font-semibold"
                                 : "text-gray-800 dark:text-white hover:text-blue-600"}
                                 `}
-                                onClick={() => setSelectedCategory(null)}
+                                onClick={() => setSelectedCategory(all)}
                                 title="All categories"
                                 tabIndex={0}
                                 role="button"
                                 onKeyDown={e => {
-                                    if (e.key === "Enter" || e.key === " ") setSelectedCategory(null);
+                                    if (e.key === "Enter" || e.key === " ") setSelectedCategory(all);
                                 }}
                             >
                                 All categories
                             </span>
-                            {selectedCategory === null && (
+                            {selectedCategory.slug === all.slug && (
                                 <span className="absolute bottom-0 left-1/2 -translate-x-1/2 block w-4/5 h-1 bg-blue-600 dark:bg-yellow-800 rounded-full"></span>
                             )}
                         </li>
                         {/* Categories */}
                         {categories.map((category) => (
-                            <li key={category.id} className="relative flex flex-col items-center justify-center h-full">
+                            <li 
+                                key={category.id} 
+                                className="relative flex flex-col items-center justify-center h-full"
+                                onClick={() => handleSelection(category)}
+                            >
                                 <span
                                     className={`cursor-pointer px-4 py-2 rounded-full transition-colors whitespace-nowrap select-none
                                     ${selectedCategory?.id === category.id

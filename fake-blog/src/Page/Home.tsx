@@ -1,16 +1,13 @@
-import { useContext, useEffect, useRef, useState } from "react";
+import { useCallback, useContext, useEffect, useRef, useState } from "react";
 import { userAuth } from "../Context/userAuth";
 import BlogsPage from "./Blogs";
 import LoginBtn from "./common/LoginBtn";
 import { UserContext } from "@/Context/userContext";
-import { getAllBlogs, type Blog } from "@/Services/BlogService";
-import { BlogContext } from "@/Context/blogContext";
+import { getAllBlogs } from "@/Services/BlogService";
 import Spinner from "./common/Spinner";
 import Categories from "./common/Categories";
 import { CategoryContext } from "@/Context/categoryContext";
 import type { Category } from "@/Services/CategoryService";
-import { SearchResultsContext } from "@/Context/searchResultsContext";
-import { BlogSkeleton } from "./common/BlogSkeleton";
 import { useBlogStore } from "@/store/useBlogStore";
 
 type Props = {};
@@ -19,56 +16,51 @@ export default function HomePage({}: Props) {
   // Contexts
   const { isLoggedIn } = userAuth();
   const user = useContext(UserContext);
-  const initialBlogs: Blog[] = useBlogStore(state => state.blogs);
   const categories: Category[] = useContext(CategoryContext);
-  const { results, searchLoading } = useContext(SearchResultsContext);
 
   // State
-  const [blogs, setBlogs] = useState<Blog[]>(initialBlogs);
   const [loading, setLoading] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const [lastPage, setLastPage] = useState(2);
+  const [hasMore, setHasMore] = useState<boolean>(true);
   const [ready, setReady] = useState(false);
 
   // Refs
   const loadMoreRef = useRef<HTMLDivElement>(null);
 
   // Infinite scroll effect
-  useEffect(() => {
-    if (!loadMoreRef.current) return;
+  // useEffect(() => {
+  //   if (!loadMoreRef.current) return;
 
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (
-          entry.isIntersecting &&
-          !loading &&
-          currentPage < lastPage
-        ) {
-          setLoading(true);
-          getAllBlogs(currentPage + 1)
-            .then((res) => {
-              const { data, meta } = res;
-              setBlogs((prev) => [...prev, ...data]);
-              useBlogStore.getState().appendBlogs(data);
-              setCurrentPage(meta.current_page);
-              setLastPage(meta.last_page);
-            })
-            .finally(() => setLoading(false));
-        }
-      },
-      {
-        root: null,
-        rootMargin: "-15px",
-        threshold: 0.1,
-      }
-    );
+  //   const observer = new IntersectionObserver(
+  //     ([entry]) => {
+  //       if (
+  //         entry.isIntersecting
+  //       ) {
+  //         setLoading(true);
+  //         getAllBlogs(currentPage + 1)
+  //           .then((res) => {
+  //             const { data, meta } = res;
+  //             useBlogStore.getState().appendBlogs(data);
+  //             setCurrentPage(meta.current_page);
+  //             setLastPage(meta.last_page);
+  //           })
+  //           .finally(() => setLoading(false));
+  //       }
+  //     },
+  //     {
+  //       root: null,
+  //       rootMargin: "10px",
+  //       threshold: 0.1,
+  //     }
+  //   );
 
-    observer.observe(loadMoreRef.current);
+  //   observer.observe(loadMoreRef.current);
 
-    return () => {
-      observer.disconnect();
-    };
-  }, [currentPage, lastPage, loading]);
+  //   return () => {
+  //     observer.disconnect();
+  //   };
+  // }, []);
 
   useEffect(() => {
     const scrollY = sessionStorage.getItem("scrollY");
@@ -95,42 +87,13 @@ export default function HomePage({}: Props) {
           </div>
         )}
 
-        <div className="h-6" />
+      <div className="h-6" />
 
         {/* Blog list with skeleton loading */}
         <div style={{ position: "relative", minHeight: "300px" }}>
-          {/* BlogSkeleton fade */}
-          <div
-            style={{
-              position: "absolute",
-              inset: 0,
-              opacity: searchLoading ? 1 : 0,
-              pointerEvents: searchLoading ? "auto" : "none",
-              transition: "opacity 0.6s cubic-bezier(0.4,0,0.2,1)",
-              zIndex: 2,
-            }}
-          >
-            <BlogSkeleton />
-          </div>
-          {/* BlogsPage fade */}
-          <div
-            style={{
-              opacity: searchLoading ? 0 : 1,
-              transition: "opacity 0.6s cubic-bezier(0.4,0,0.2,1)",
-              zIndex: 1,
-            }}
-          >
-            <BlogsPage blogs={results.length ? results : blogs} />
-          </div>
+            <BlogsPage/>
         </div>
-
-        {/* Infinite scroll loader */}
-        <div
-          ref={loadMoreRef}
-          className="dark:bg-[#0a0f2c] flex justify-around pt-16 pb-6"
-        >
-          {loading && <Spinner />}
-        </div>
+        
       </div>
 
       {/* Suggestions sidebar (1/3) */}

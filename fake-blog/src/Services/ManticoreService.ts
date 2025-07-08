@@ -7,6 +7,7 @@ export interface AutocompleteData {
 
 export async function autocomplete(query: string): Promise<AutocompleteData | undefined> {
     const data = await axios.get(`/api/v1/manticore/autocomplete/?query=${encodeURIComponent(query)}`);
+    
     if (data.status === 200) {
         return data.data.data;
     } else {

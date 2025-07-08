@@ -141,23 +141,6 @@ app.post('/comment', async (req,res) => {
   }
 });
 
-app.post('/like', async(req, res) => {
-  const blog_id = req.body;
-
-  try {
-    let like = await axios.post('http://localhost:8000/api/v1/posts/like', blog_id, {
-      headers: {
-        Authorization: `Bearer ${req.cookies.access_token}`
-      }
-    });
-    like = like.data.data;
-    return res.status(200).send(like);
-    
-  } catch (error) {
-    console.error(error);
-  }
-})
-
 app.delete('/comment/:id', async (req, res) => {
   const id = req.params.id;
 
@@ -176,6 +159,68 @@ app.delete('/comment/:id', async (req, res) => {
       console.log('Unknown error:', error.message);
       return res.status(500).json({ message: 'Internal Server Error' });
     }
+  }
+});
+
+app.post('/like', async(req, res) => {
+  const blog_id = req.body;
+
+  try {
+    let like = await axios.post('http://localhost:8000/api/v1/posts/like', blog_id, {
+      headers: {
+        Authorization: `Bearer ${req.cookies.access_token}`
+      }
+    });
+    like = like.data.data;
+    return res.status(200).send(like);
+    
+  } catch (error) {
+    console.error(error);
+  }
+})
+
+app.post('/save/:id', async(req, res) => {
+  try {
+    const result = await axios.post('http://localhost:8000/api/v1/posts/toggle_saving/' + req.params.id, null,{
+      headers: {
+        Authorization: `Bearer ${req.cookies.access_token}`
+      }
+    });
+    res.send(result.data);
+  } catch (error) {
+    console.error(error)
+  }
+})
+
+app.get('/savedBlogs', async(req, res) => {
+  try {
+    const data = await axios.get('http://localhost:8000/api/v1/posts/savedBlogs', {
+      headers: {
+        Authorization: `Bearer ${req.cookies.access_token}`
+      }
+    });
+    return res.send(data.data);
+  } catch (error) {
+    console.error('Something went wrong with fetching saved blogs:', error);
+    throw error;
+  }
+});
+
+app.get('/posts', async(req, res) => {
+  const page = req.query.page;
+  try {
+    
+    const data = await axios.get(`http://localhost:8000/api/v1/posts?page=${page}`, {
+      headers: {
+        Authorization: `Bearer ${req.cookies.access_token}`
+      }
+    });
+
+    return res.send(data.data);
+
+  } catch (error) {
+    console.error(error);
+    throw error;
   }
 });
 
@@ -219,7 +264,7 @@ app.use('*all', async (req, res) => {
       render = (await import('./dist/server/entry-server.js')).render
     }
 
-    const rendered = await render(url, blogs.data, categories, user)
+    const rendered = await render(url, categories, user)
 
     const blogsScript = 
       `<script>

@@ -1,9 +1,9 @@
-import { useRef, useState, useEffect, useContext } from "react";
+import { useRef, useState, useEffect } from "react";
 import Spinner from "./Spinner";
 import { searchBlogs } from "@/Services/BlogService";
 import SearchButton from "./SearchButton";
-import { SearchResultsContext } from "@/Context/searchResultsContext";
 import { autocomplete } from "@/Services/ManticoreService";
+import { useBlogStore } from "@/store/useBlogStore";
 
 type Props = {};
 
@@ -15,8 +15,6 @@ const SearchBar = ({}: Props) => {
   const [recommendsBlogs, setRecommendsBlogs] = useState<string[]>();
   const [showRecommends, setShowRecommends] = useState(false);
   const [selectedIndex, setSelectedIndex] = useState<number>(-1);
-
-  const { setResults, setSearchLoading } = useContext(SearchResultsContext);
 
   const debounceTimeout = useRef<NodeJS.Timeout | null>(null);
   const listRefs = useRef<(HTMLLIElement | null)[]>([]);
@@ -65,16 +63,16 @@ const SearchBar = ({}: Props) => {
           e.preventDefault();
           try {
             setSpinnerForSearching(true);
-            setSearchLoading(true);
+            useBlogStore.getState().setLoading(true);
             if(query === '') {
-              setResults([]);
+              useBlogStore.getState().clearFiltered();
               setSpinnerForSearching(false);
-              setSearchLoading(false);
+              useBlogStore.getState().setLoading(false);  
               return;
             }
             const response = await searchBlogs(query);
-            setSearchLoading(false);
-            setResults(response);
+            useBlogStore.getState().setLoading(false);
+            useBlogStore.getState().setFiltered(response);
             setSpinnerForSearching(false);
           } catch (error) {
             setSpinner(false);

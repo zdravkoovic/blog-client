@@ -20,10 +20,12 @@ export default function({lc, blogId, likedByUser}: Props) {
         setLiked(!liked);
         setLikesCount((prev) => liked ? prev - 1 : prev + 1);
         try {
+            console.log("Blog ID",blogId);
             useBlogStore.getState().updateBlog(blogId, {
                 likes_count: newLikesCount,
                 did_user_like: newLiked
             })
+            useBlogStore.getState();
             const res = await axiosSSR.post("/like", {post_id: blogId});
             if(res.status === 200) {
                 toast.success(`Blog is ${res.data === 1 ? "liked" : "unliked"}`);

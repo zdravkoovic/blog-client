@@ -1,9 +1,11 @@
 import { Avatar, AvatarImage } from "@/components/ui/avatar";
-import type { Blog } from "@/Services/BlogService"
+import { save1unsave, type Blog } from "@/Services/BlogService"
 import { formatDate } from "@/Services/DateService";
 import ThumbUp from '@mui/icons-material/ThumbUp';
 import ChatBubbleOutline from '@mui/icons-material/ChatBubbleOutline';
 import { Link } from "react-router-dom";
+import { useBlogStore } from "@/store/useBlogStore";
+import { toast } from "react-toastify";
 
 type Props = {
     id: number;
@@ -16,6 +18,8 @@ type Props = {
     comments_count: number;
     likes_count: number;
     blog_image_url?: string;
+    did_user_save: boolean;
+    ref?: (node: HTMLDivElement) => void
 }
 
 export default function BlogCard({
@@ -28,14 +32,30 @@ export default function BlogCard({
     content,
     comments_count,
     likes_count,
-    blog_image_url
+    blog_image_url,
+    did_user_save,
+    ref
 }: Props) {
+
+    const handleSaveBlogClick = async (e: any) => {
+        e.stopPropagation();
+        e.preventDefault();
+        
+        useBlogStore.getState().updateBlog(id, {
+            did_user_save: !did_user_save
+        })
+
+        const result = await save1unsave(id);
+
+        result?.data ? toast.success("Blog is saved") : toast.info("Blog is unsaved");
+    } 
+
   return (
-    <div key={id} className="mb-0">
+    <div key={id} className="mb-0" ref={ref}>
         <Link
             to={slug}
             state={{ blog: blog }}
-            className="no-underline block"
+            className="no-underline block z-20"
             onClick={() => {
                 sessionStorage.setItem("scrollY", window.scrollY.toString());
             }}
@@ -96,11 +116,23 @@ export default function BlogCard({
                             <ThumbUp fontSize="small" />
                             <span>{likes_count}</span>
                         </button>
-                        <button className="flex items-center gap-x-1 hover:text-yellow-500 transition-colors" title="Save">
-                            <svg width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 5v14l7-5 7 5V5a2 2 0 00-2-2H7a2 2 0 00-2 2z" />
+                        <button 
+                            className={`flex items-center gap-x-1 transition-colors duration-200 ${
+                                did_user_save ? 'text-yellow-500' : 'hover:text-yellow-500 text-gray-500'
+                            }`} 
+                            title={blog.did_user_save ? 'Unsave' : 'Save'}
+                            onClick={handleSaveBlogClick}
+                        >
+                            <svg width="20" height="20" fill={did_user_save ? "currentColor" : "none"} viewBox="0 0 24 24" stroke="currentColor">
+                                <path 
+                                strokeLinecap="round" 
+                                strokeLinejoin="round" 
+                                strokeWidth={2} 
+                                d="M5 5v14l7-5 7 5V5a2 2 0 00-2-2H7a2 2 0 00-2 2z" 
+                                />
                             </svg>
                         </button>
+
                         </div>
                     </div>
                     </div>

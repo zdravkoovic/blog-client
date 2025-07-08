@@ -24,12 +24,13 @@ export interface Blog{
     };    
     cover_image: string;
     did_user_like: boolean;
+    did_user_save: boolean;
 }
 
-export async function getAllBlogs(page: number, token?: string): Promise<ResponseHelper<Blog[]>> {
-    const res = await axios.get(`/api/v1/posts?page=${page}`,{
+export async function getAllBlogs(page: number, token? : string): Promise<ResponseHelper<Blog[]>> {
+    const res = await axiosSSR.get(`/posts?page=${page}`, {
         headers: {
-            Authorization: token ? `Bearer ${token}` : "",
+            Cookie: `access_token=${token}`
         }
     });
     return res.data;
@@ -58,5 +59,14 @@ export async function searchBlogs(query: string): Promise<Blog[]> {
     } catch (error) {
         console.error('Search error:', error);
         return [];
+    }
+}
+
+export async function save1unsave(blogId: number) {
+    try {
+        const result  = await axiosSSR.post(`/save/${blogId}`)
+        return result.data;
+    } catch(error){
+        console.error('Search error:', error);
     }
 }
