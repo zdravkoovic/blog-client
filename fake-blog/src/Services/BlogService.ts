@@ -1,7 +1,7 @@
 import axiosSSR from "@/components/auth/axiosSSR";
 import axios from "../components/axios";
 import slugify from 'react-slugify';
-import type { ResponseHelper } from "@/Models/ResponseHelper";
+import type { ResponseHelper } from "@/models/ResponseHelper";
 
 export interface Blog{
     id: number;

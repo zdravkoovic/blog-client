@@ -1,10 +1,10 @@
 import { renderToString } from 'react-dom/server'
 import { matchRoutes, renderMatches, StaticRouter, type RouteObject } from 'react-router-dom';
-import { routeDefinitions } from './Routes/Routes';
-import type { User } from './Models/User';
-import { UserContext } from './Context/userContext';
-import type { Category } from './Services/CategoryService';
-import { CategoryContext } from './Context/categoryContext';
+import { routeDefinitions } from './routes/Routes';
+import { type User } from './models/User';
+import { UserContext } from './context/userContext';
+import type { Category } from './services/CategoryService';
+import { CategoryContext } from './context/categoryContext';
 
 
 interface RenderResult {

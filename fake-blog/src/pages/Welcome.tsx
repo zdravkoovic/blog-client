@@ -1,4 +1,4 @@
-import LoginBtn from "./common/LoginBtn"
+import LoginBtn from "@/features/auth/components/LoginBtn"
 
 type Props = {}
 

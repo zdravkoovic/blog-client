@@ -1,11 +1,11 @@
 import * as Yup from "yup";
 import { useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
-import axiosSSR from "../components/auth/axiosSSR";
-import Spinner from "./common/Spinner";
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import { toast } from "react-toastify";
+import axiosSSR from "@/components/auth/axiosSSR";
+import Spinner from "@/components/ui/Spinner";
 
 type Props = {}
 

@@ -1,8 +1,8 @@
 import * as Yup from "yup";
-import { userAuth } from '../Context/userAuth';
 import { useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import { Link } from "react-router-dom";
+import { userAuth } from "@/Context/userAuth";
 
 type Props = {}
 

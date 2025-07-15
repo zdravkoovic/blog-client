@@ -1,14 +1,13 @@
 import './App.css'
 import { ToastContainer } from 'react-toastify';
 import "react-toastify/ReactToastify.css"
-import { UserProvider } from './Context/userAuth';
 import { Outlet, useLocation } from 'react-router-dom';
-import './Services/echo';
-import { TagProvider } from './Context/tagContext';
-import Header from './Page/Header';
-import { SearchResultsProvider } from './Context/searchResultsContext';
 import { useEffect } from 'react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { TagProvider } from './context/tagContext';
+import { UserProvider } from './context/userAuth';
+import { SearchResultsProvider } from './context/searchResultsContext';
+import Header from './features/dashboard/components/Header';
 
 
 function App() {

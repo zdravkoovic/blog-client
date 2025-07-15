@@ -1,11 +1,12 @@
 import { useLocation } from "react-router-dom"
 import { Avatar, AvatarImage } from "@/components/ui/avatar";
-import { formatDate } from "@/Services/DateService";
 import { Button } from "@/components/ui/button";
 import { MessageCircle } from "lucide-react";
 import { useEffect, useState } from "react";
-import Like from "./common/Like";
-import Comments from "./common/Comment";
+import Comments from "../components/Comment";
+import { formatDate } from "@/services/DateService";
+import Like from "../components/Like";
+
 
 
 type Props = {}

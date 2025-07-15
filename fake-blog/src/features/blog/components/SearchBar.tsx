@@ -1,9 +1,9 @@
 import { useRef, useState, useEffect } from "react";
-import Spinner from "./Spinner";
 import { searchBlogs } from "@/Services/BlogService";
 import SearchButton from "./SearchButton";
-import { autocomplete } from "@/Services/ManticoreService";
+import { autocomplete } from "@/services/ManticoreService";
 import { useBlogStore } from "@/store/useBlogStore";
+import Spinner from "@/components/ui/Spinner";
 
 type Props = {};
 

@@ -1,11 +1,14 @@
 import { Avatar, AvatarImage } from "@/components/ui/avatar";
 import { save1unsave, type Blog } from "@/Services/BlogService"
-import { formatDate } from "@/Services/DateService";
 import ThumbUp from '@mui/icons-material/ThumbUp';
 import ChatBubbleOutline from '@mui/icons-material/ChatBubbleOutline';
 import { Link } from "react-router-dom";
-import { useBlogStore } from "@/store/useBlogStore";
 import { toast } from "react-toastify";
+import { formatDate } from "@/services/DateService";
+import { useQueryClient } from "@tanstack/react-query";
+import { useContext } from "react";
+import { UserContext } from "@/Context/userContext";
+import { useSaveBlog } from "../hooks/useSaveBlog";
 
 type Props = {
     id: number;
@@ -37,17 +40,26 @@ export default function BlogCard({
     ref
 }: Props) {
 
+    const queryClient = useQueryClient();
+    const user = useContext(UserContext);
+
+    const { mutate: save, isPending: isSaving } = useSaveBlog(user?.id);
+
     const handleSaveBlogClick = async (e: any) => {
         e.stopPropagation();
         e.preventDefault();
+
+        save(id);
         
-        useBlogStore.getState().updateBlog(id, {
-            did_user_save: !did_user_save
-        })
+        // useBlogStore.getState().updateBlog(id, {
+        //     did_user_save: !did_user_save
+        // })
 
-        const result = await save1unsave(id);
+        // const result = await save1unsave(id);
 
-        result?.data ? toast.success("Blog is saved") : toast.info("Blog is unsaved");
+        // await queryClient.invalidateQueries({queryKey: ['saved-blogs', user?.id]});
+
+        // result?.data ? toast.success("Blog is saved") : toast.info("Blog is unsaved");
     } 
 
   return (
@@ -89,7 +101,7 @@ export default function BlogCard({
                     />
 
                     {/* Tagovi */}
-                    {blog.tags && blog.tags.names.length > 0 && (
+                      {blog.tags && blog.tags.names !== undefined && blog.tags.names.length > 0 && (
                         <div className="flex flex-wrap gap-2 mb-3">
                             {blog.tags.names.map((tag, index) => (
                                 <span
@@ -121,6 +133,7 @@ export default function BlogCard({
                                 did_user_save ? 'text-yellow-500' : 'hover:text-yellow-500 text-gray-500'
                             }`} 
                             title={blog.did_user_save ? 'Unsave' : 'Save'}
+                            
                             onClick={handleSaveBlogClick}
                         >
                             <svg width="20" height="20" fill={did_user_save ? "currentColor" : "none"} viewBox="0 0 24 24" stroke="currentColor">

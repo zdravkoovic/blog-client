@@ -1,10 +1,9 @@
-import { useContext, useEffect, useRef, useState } from "react";
-import { UserContext } from "../Context/userContext";
-import Welcome from "./Welcome";
-import CompanyLogo from "./common/CompanyLogo";
-import MenuAvatar from "./common/MenuAvatar";
-import SearchBar from "./common/SearchBar";
-import { set } from "react-hook-form";
+import CompanyLogo from "@/components/ui/CompanyLogo";
+import { UserContext } from "@/Context/userContext";
+import SearchBar from "@/features/blog/components/SearchBar";
+import Welcome from "@/pages/Welcome";
+import { useContext, useState } from "react";
+import MenuAvatar from "./MenuAvatar";
 
 type Props = {}
 
@@ -13,11 +12,8 @@ export default function Header({}: Props) {
 
   const isLoggedIn = () => user !== null;
 
-  const HEADER_HEIGHT = 70; 
-  const DAMPING = 0.333;
-  const [headerOffset, setHeaderOffset] = useState(0);
-  const lastScrollY = useRef(0);
-  const offsetRef = useRef(window.scrollY);
+
+  const [headerOffset] = useState(0);
 
   // useEffect(() => {
   //     const handleScroll = () => {

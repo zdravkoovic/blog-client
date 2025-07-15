@@ -1,77 +1,40 @@
 import { useState, useRef, useContext, useEffect } from "react";
-import { getSavedBlogs, type Category } from "@/Services/CategoryService";
-import { CategoryContext } from "@/Context/categoryContext";
-import { SearchResultsContext } from "@/Context/searchResultsContext";
+import { type Category } from "@/services/CategoryService";
 import { useBlogStore } from "@/store/useBlogStore";
 import { UserContext } from "@/Context/userContext";
-import useSavedBlogs from "@/hooks/useSavedBlogs";
+import useSavedBlogs from "@/features/blog/hooks/useBlogsByCategory";
+import { useCategories } from "../hooks/useCategories";
+import { CategoryContext } from "@/context/categoryContext";
 
-type Props = {
-    categories: Category[];
-};
+type Props = {};
 
 const all : Category = {id: -1, slug: 'all', name: 'all'}
 
-export default function Categories({categories}: Props) {
-    const [selectedCategory, setSelectedCategory] = useState<Category>(() => {
-    const raw = sessionStorage.getItem('selectedCategory');
-        if (raw) {
-        try {
-            return JSON.parse(raw);
-        } catch {}
-        }
-        return all;
-    });
+export default function Categories({}: Props) {
 
-    const [slug, setSlug] = useState(all.slug);
+    const contextCategories = useContext(CategoryContext);
 
-    const user = useContext(UserContext);
+    const {categories, setCategories, category, setCategory} = useCategories();
 
-    const { data: filtered, isLoading, isError } = useSavedBlogs(user?.id ?? -1);
+
+    // const { data: filtered, isLoading } = useSavedBlogs(user?.id ?? -1); // ima i isError
 
     const scrollRef = useRef<HTMLUListElement>(null);
 
-    const handleSelection = async(category: Category) => {
-
-        
-        let data;
-        setSlug(category.slug);
-        switch(category.slug){
-            case 'all':
-                useBlogStore.getState().clearFiltered();
-                break;
-            case 'saved':
-                data = filtered;
-                break;
-            default:
-                break;
-        }
-        
-        if(data !== undefined)
-        {
-            useBlogStore.getState().setFiltered(data);
-        }
-        
-    }
 
     useEffect(() => {
-        const raw = sessionStorage.getItem('selectedCategory');
-        if(raw)
-        {
-            const category: Category = JSON.parse(raw);
-            setSelectedCategory(category);
-        }
-    }, []);
+        setCategories(contextCategories);
+    }, [contextCategories]);
 
-    useEffect(() => {
-        if(slug === 'saved'){
-            useBlogStore.getState().setLoading(isLoading);
-        }
-    }, [isLoading, slug])
+    // useEffect(() => {
+    //     if(slug === 'saved'){
+    //         useBlogStore.getState().setLoading(isLoading);
+    //     }
+    // }, [isLoading, slug])
 
-    useEffect(() => {
-        sessionStorage.setItem('selectedCategory', JSON.stringify(selectedCategory));        
-    }, [selectedCategory]);
+    // useEffect(() => {
+    //     sessionStorage.setItem('selectedCategory', JSON.stringify(selectedCategory));        
+    // }, [selectedCategory]);
 
     return (
         <div className="w-full">
@@ -104,52 +67,50 @@ export default function Categories({categories}: Props) {
                         {/* All categories */}
                         <li 
                             className="relative flex flex-col items-center justify-center h-full"
-                            onClick={() => handleSelection(all)}
+                            onClick={() => setCategory(all)}
                         >
                             <span
                                 className={`cursor-pointer px-4 py-2 rounded-full transition-colors whitespace-nowrap select-none
-                                ${selectedCategory.slug === all.slug
-                                ? "text-blue-600 dark:text-yellow-600 font-semibold"
-                                : "text-gray-800 dark:text-white hover:text-blue-600"}
+                                    ${category.slug === all.slug
+                                    ? "text-blue-600 dark:text-yellow-600 font-semibold"
+                                    : "text-gray-800 dark:text-white hover:text-blue-600"}
                                 `}
-                                onClick={() => setSelectedCategory(all)}
                                 title="All categories"
                                 tabIndex={0}
                                 role="button"
                                 onKeyDown={e => {
-                                    if (e.key === "Enter" || e.key === " ") setSelectedCategory(all);
+                                    if (e.key === "Enter" || e.key === " ") setCategory(all);
                                 }}
                             >
                                 All categories
                             </span>
-                            {selectedCategory.slug === all.slug && (
+                            {category.slug === all.slug && (
                                 <span className="absolute bottom-0 left-1/2 -translate-x-1/2 block w-4/5 h-1 bg-blue-600 dark:bg-yellow-800 rounded-full"></span>
                             )}
                         </li>
                         {/* Categories */}
-                        {categories.map((category) => (
+                        {categories.map((item) => (
                             <li 
-                                key={category.id} 
+                                key={item.id} 
                                 className="relative flex flex-col items-center justify-center h-full"
-                                onClick={() => handleSelection(category)}
+                                onClick={() => setCategory(item)}
                             >
                                 <span
                                     className={`cursor-pointer px-4 py-2 rounded-full transition-colors whitespace-nowrap select-none
-                                    ${selectedCategory?.id === category.id
+                                    ${item?.id === category.id
                                         ? "text-blue-600 dark:text-yellow-600 font-semibold"
                                         : "text-gray-800 dark:text-white hover:text-blue-600"}
                                     `}
-                                    onClick={() => setSelectedCategory(category)}
-                                    title={category.name}
-                                    tabIndex={0}
+                                    title={item.name}
+                                    tabIndex={item.id}
                                     role="button"
-                                    onKeyDown={e => {
-                                        if (e.key === "Enter" || e.key === " ") setSelectedCategory(category);
-                                    }}
+                                    // onKeyDown={e => {
+                                    //     if (e.key === "Enter" || e.key === " ") setCategory(item);
+                                    // }}
                                 >
-                                    {category.name}
+                                    {item.name}
                                 </span>
-                                {selectedCategory?.id === category.id && (
+                                {item?.id === category.id && (
                                     <span className="absolute bottom-0 left-1/2 -translate-x-1/2 block w-4/5 h-1 bg-blue-600 dark:bg-yellow-800 rounded-full"></span>
                                 )}
                             </li>

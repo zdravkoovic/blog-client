@@ -1,5 +1,5 @@
 import { useContext, useState } from "react";
-import { useForm } from "react-hook-form";
+// import { useForm } from "react-hook-form";
 import { Menu, MenuButton, MenuItem, MenuItems } from "@headlessui/react";
 import { LogOutIcon, SettingsIcon } from "lucide-react";
 import AddIcon from "@mui/icons-material/Add";
@@ -7,7 +7,7 @@ import { Avatar, AvatarImage } from "@/components/ui/avatar";
 import { UserContext } from "@/Context/userContext";
 import axiosSSR from "@/components/auth/axiosSSR";
 import SettingsModal from "./Settings";
-import CreateBlogModal from "./CreateBlogModal";
+import CreateBlogModal from "@/features/blog/CreateBlogModal";
 
 type Props = {};
 
@@ -15,7 +15,7 @@ export default function MenuAvatar({}: Props) {
     const user = useContext(UserContext);
     const [showCreateBlog, setShowCreateBlog] = useState(false);
     const [showSettings, setShowSettings] = useState(false);
-    const { handleSubmit } = useForm();
+    // const { handleSubmit } = useForm();
 
     const openModal = () => setShowCreateBlog(true);
     const closeModal = () => setShowCreateBlog(false);

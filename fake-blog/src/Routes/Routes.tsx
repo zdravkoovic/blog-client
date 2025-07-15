@@ -1,9 +1,9 @@
+import HomePage from "@/pages/Home";
 import App from "../App";
-import LoginPage from "../Page/Login";
-import RegisterPage from "../Page/Register";
-import Page404 from "../Page/404";
-import HomePage from "../Page/Home";
-import BlogPage from "../Page/BlogDetailes";
+import LoginPage from "@/features/auth/pages/Login";
+import RegisterPage from "@/features/auth/pages/Register";
+import BlogPage from "@/features/blog/pages/BlogDetailes";
+import Page404 from "@/pages/404";
 
 export const routeDefinitions = [
   {

@@ -224,13 +224,34 @@ app.get('/posts', async(req, res) => {
   }
 });
 
+app.get('/blogsByCategory', async (req, res) => {
+  const page = req.query.page;
+  const categoryId = req.query.category;
+  
+  try {
+    
+    const results = await axios.get(`http://localhost:8000/api/v1/posts/blogsByCategory?category=${categoryId}&page=${page}`, {
+      headers: {
+        Authorization: `Bearer ${req.cookies.access_token}`
+      }
+    });
+
+    res.send(results.data);
+
+  } catch (error) {
+    console.error(error);
+    throw error;
+  }
+});
+
 // Serve HTML
 app.use('*all', async (req, res) => {
   try {
     const url = req.originalUrl.replace(base, '')
     const access_token = req.cookies.access_token;
 
-    const { getAllBlogs } = await vite.ssrLoadModule('/src/Services/BlogService.ts');
+    const { getAllBlogs } = await vite.ssrLoadModule('/src/services/BlogService.ts');
+    const { getBlogsByCategory } = await vite.ssrLoadModule('/src/features/blog/api/blogApi.ts');
     const blogs = await getAllBlogs(1, access_token);
 
     const { getCategoryList } = await vite.ssrLoadModule('/src/Services/CategoryService.ts');

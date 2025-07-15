@@ -1,12 +1,10 @@
 import { Avatar, AvatarImage } from "@/components/ui/avatar"
-import { Button } from "@/components/ui/button"
-import { Textarea } from "@/components/ui/textarea"
-import { formatDate } from "@/Services/DateService"
-import Spinner from "./Spinner"
-import { deleteComment, getComments, postComment, type Comment } from "@/Services/CommentService"
+import { deleteComment, getComments, postComment, type Comment } from "@/services/CommentService"
 import { useEffect, useState } from "react"
 import { MoreVertical } from "lucide-react"
 import { toast } from "react-toastify"
+import Spinner from "@/components/ui/Spinner"
+import { formatDate } from "@/services/DateService"
 
 type Props = {
   blogId: number;

@@ -7,7 +7,7 @@ import { useEffect, useState } from 'react';
 import CreatableSelect from 'react-select/creatable';
 import { tagContext } from '../../Context/tagContext';
 import { createBlog } from '../../Services/BlogService';
-import Dialog from './Dialog';
+import DialogConfirm from '@/components/ui/Dialog';
 
 interface CreateBlogModalProps {
     show: boolean,
@@ -88,7 +88,7 @@ const CreateBlogModal: React.FC<CreateBlogModalProps> = ({ show, onHide })=> {
 
   return (
     <>
-      {confirm && <Dialog open={confirm} handleAgree={handleAgree} handleDisagree={handleDissagree}/>}
+      {confirm && <DialogConfirm open={confirm} handleAgree={handleAgree} handleDisagree={handleDissagree}/>}
       <Modal show={show} onHide={onHide}>
           <div className="h-fit dark:bg-gray-900 dark:text-white bg-white text-black rounded-lg">
         <Modal.Header closeButton className="dark:bg-gray-800 dark:text-white">
