@@ -2,8 +2,8 @@ import './App.css'
 import { ToastContainer } from 'react-toastify';
 import "react-toastify/ReactToastify.css"
 import { Outlet, useLocation } from 'react-router-dom';
-import { useEffect } from 'react';
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { useEffect, useState } from 'react';
+import { HydrationBoundary, QueryClient, QueryClientProvider, type DehydratedState } from '@tanstack/react-query';
 import { TagProvider } from './context/tagContext';
 import { UserProvider } from './context/userAuth';
 import { SearchResultsProvider } from './context/searchResultsContext';
@@ -14,7 +14,26 @@ function App() {
   const location = useLocation();
   const currentPath = location.pathname;
 
-  const queryClient = new QueryClient();
+  const [dehydratedState, setDehydratedState] = useState<DehydratedState | null>(null);
+
+  useEffect(() => {
+    const el = document.getElementById('__REACT_QUERY_STATE__');
+    if (el) {
+      const data = JSON.parse(el.textContent || '{}');
+      setDehydratedState(data);
+    }
+  }, []);
+  
+  const [queryClient] = useState(
+    () => 
+      new QueryClient({
+        defaultOptions: {
+          queries: {
+            staleTime: 1000 * 20,
+          },
+        },
+      }),
+  )
   
   useEffect(() => {
     const theme = localStorage.getItem('app-theme');
@@ -33,7 +52,9 @@ function App() {
             {!currentPath.includes('/login') && !currentPath.includes('/register')
               && <Header/>
             }
-              <Outlet />
+              <HydrationBoundary state={dehydratedState}>
+                <Outlet />
+              </HydrationBoundary>
             <ToastContainer />
             </SearchResultsProvider>
           </UserProvider>

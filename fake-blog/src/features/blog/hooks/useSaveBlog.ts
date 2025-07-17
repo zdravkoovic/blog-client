@@ -2,10 +2,12 @@ import {  useMutation, useQueryClient, type InfiniteData, type QueryKey } from "
 import { save1unsave } from "../api/blogAPI";
 import type { ResponseHelper } from "@/models/ResponseHelper";
 import type { Blog } from "@/models/Blog";
+import { useCategories } from "@/features/categories/hooks/useCategories";
 
 export function useSaveBlog(userId: number | undefined)
 {
     const qc = useQueryClient();
+    const { categories } = useCategories();
     // const key = ['blogs', categorySlug, userId] as const;
 
     return useMutation<
@@ -24,28 +26,32 @@ export function useSaveBlog(userId: number | undefined)
             
                 const snapshots = qc.getQueriesData<InfiniteData<ResponseHelper<Blog[]>>>({ predicate: query => query.queryKey[0] === 'blogs' });
 
-                qc.setQueriesData<InfiniteData<ResponseHelper<Blog[]>>>(
-                    {
-                        predicate: query => query.queryKey[0] === 'blogs',
-                    },
-                    (data) => {
-                if (!data) return data;
+                for (const category of categories) {
+                    
+                    qc.setQueryData<InfiniteData<ResponseHelper<Blog[]>>>(['blogs', category.slug, userId], (oldData) => {
+                        if (!oldData) return oldData;
+                        
+                        return {
+                            ...oldData,
+                            pages: oldData.pages.map((page) => ({
+                                ...page,
+                                data: page.data
+                                    .map((b) => {
+                                        if(b.id !== blogId) return b;
+                                        
+                                        const updatedBlog = { ...b, did_user_save: !b.did_user_save };
+                                        
+                                        if(category.slug === 'saved' && !updatedBlog.did_user_save) {
+                                            return null;
+                                        }
 
-                return {
-                    pageParams: data.pageParams,
-                    pages: data.pages.map((page) => ({
-                        ...page,
-                        data: page.data.map((b) =>
-                            b.id === blogId
-                                ? {
-                                    ...b,
-                                    did_user_save: !b.did_user_save
-                                }
-                                : b
-                        ),
-                    })),
-                };
-            });
+                                        return updatedBlog;
+                                    })
+                                    .filter((b) => b !== null)
+                            })
+                        )}
+                    })
+                }
 
             return { snapshots };
         },

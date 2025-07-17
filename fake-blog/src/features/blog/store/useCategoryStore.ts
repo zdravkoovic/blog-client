@@ -1,7 +1,7 @@
 import type { Category } from "@/models/Category";
 import { create } from "zustand";
 
-const all: Category = { id: -1, name: 'all', slug: 'all' };
+const all: Category = { id: -1, name: 'All categories', slug: 'all' };
 
 interface CategoryState {
     categories: Category[];
@@ -13,7 +13,9 @@ interface CategoryState {
 
 export const useCategoryStore = create<CategoryState>((set) => ({
     categories: [],
-    setCategories: (categories) => set({ categories }),
+    setCategories: (categories) => set({
+        categories: [all, ...categories]
+    }),
     
     category: all,
     setCategory: (category) => set({ category }),

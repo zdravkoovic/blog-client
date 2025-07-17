@@ -285,7 +285,7 @@ app.use('*all', async (req, res) => {
       render = (await import('./dist/server/entry-server.js')).render
     }
 
-    const rendered = await render(url, categories, user)
+    const rendered = await render(url, categories, user, access_token)
 
     const blogsScript = 
       `<script>
@@ -301,11 +301,14 @@ app.use('*all', async (req, res) => {
       `<script>
         window.__USER__ = ${JSON.stringify(user)};
       </script>`
+      
+    const dehydratedStateScript = `<script id="__REACT_QUERY_STATE__" type="application/json">
+        ${JSON.stringify(rendered.dehydratedState)}
+      </script>`;
 
     const html = template
-      .replace(`<!--app-head-->`, rendered.head ?? '')
+      .replace(`<!--app-head-->`, `${rendered.head ?? ''}\n${dehydratedStateScript}`)
       .replace(`<!--ssr-outlet-->`, rendered.html ?? '')
-      .replace(`<!--initial-data-->`, blogsScript)
       .replace(`<!--categories-->`, categoriesScript)
       .replace(`<!--user-->`, userScript)
 

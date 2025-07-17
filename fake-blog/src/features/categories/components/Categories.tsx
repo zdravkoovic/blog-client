@@ -65,7 +65,7 @@ export default function Categories({}: Props) {
                         style={{ alignItems: "center", marginBottom: 0 }}
                     >
                         {/* All categories */}
-                        <li 
+                        {/* <li 
                             className="relative flex flex-col items-center justify-center h-full"
                             onClick={() => setCategory(all)}
                         >
@@ -87,7 +87,7 @@ export default function Categories({}: Props) {
                             {category.slug === all.slug && (
                                 <span className="absolute bottom-0 left-1/2 -translate-x-1/2 block w-4/5 h-1 bg-blue-600 dark:bg-yellow-800 rounded-full"></span>
                             )}
-                        </li>
+                        </li> */}
                         {/* Categories */}
                         {categories.map((item) => (
                             <li 

@@ -12,21 +12,24 @@ export async function getAllBlogs(page: number, token? : string): Promise<Respon
     return res.data;
 }
 
-export async function getBlogsByCategory(categoryId: number, page: number): Promise<ResponseHelper<Blog[]> | undefined>
+export async function getBlogsByCategory(categoryId: number, page: number, token? : string): Promise<ResponseHelper<Blog[]> | undefined>
 {
     try {
-        
         const res  = await axiosSSR.get('/blogsByCategory', {
             params: {
                 category: categoryId,
                 page
             },
+            headers: {
+                Cookie: `access_token=${token}`
+            }
         });
 
         return res.data;
 
     } catch (error) {
         handleError(error);
+        throw error;
     }
 }
 

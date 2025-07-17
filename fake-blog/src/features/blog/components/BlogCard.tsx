@@ -9,6 +9,7 @@ import { useQueryClient } from "@tanstack/react-query";
 import { useContext } from "react";
 import { UserContext } from "@/Context/userContext";
 import { useSaveBlog } from "../hooks/useSaveBlog";
+import { useCategories } from "@/features/categories/hooks/useCategories";
 
 type Props = {
     id: number;
@@ -40,7 +41,6 @@ export default function BlogCard({
     ref
 }: Props) {
 
-    const queryClient = useQueryClient();
     const user = useContext(UserContext);
 
     const { mutate: save, isPending: isSaving } = useSaveBlog(user?.id);

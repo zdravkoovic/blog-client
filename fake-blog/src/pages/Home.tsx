@@ -1,10 +1,8 @@
 import { useContext, useEffect, useState } from "react";
 import { UserContext } from "@/Context/userContext";
-import type { Category } from "@/services/CategoryService";
 import LoginBtn from "@/features/auth/components/LoginBtn";
 import BlogsPage from "@/features/blog/pages/Blogs";
 import { userAuth } from "@/context/userAuth";
-import { CategoryContext } from "@/context/categoryContext";
 import Categories from "@/features/categories/components/Categories";
 
 type Props = {};
@@ -13,10 +11,10 @@ export default function HomePage({}: Props) {
   // Contexts
   const { isLoggedIn } = userAuth();
   const user = useContext(UserContext);
-  const categories: Category[] = useContext(CategoryContext);
 
   // State
   const [ready, setReady] = useState(false);
+
 
   useEffect(() => {
     const scrollY = sessionStorage.getItem("scrollY");
@@ -47,7 +45,7 @@ export default function HomePage({}: Props) {
 
         {/* Blog list with skeleton loading */}
         <div style={{ position: "relative", minHeight: "300px" }}>
-            <BlogsPage/>
+            <BlogsPage />
         </div>
         
       </div>

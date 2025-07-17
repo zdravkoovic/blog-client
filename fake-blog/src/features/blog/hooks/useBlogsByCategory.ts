@@ -20,9 +20,12 @@ export default function useBlogsByCategory(
         const next = lastPage.meta.current_page + 1;
         return next <= lastPage.meta.last_page ? next : undefined;
       },
-      staleTime: 1000 * 60 * 10,
+      staleTime: 1000 * 60,
       placeholderData: keepPreviousData,
       enabled: !!userId && !!category,
+      refetchOnWindowFocus: false,
+      refetchOnReconnect: false,
+      refetchOnMount: false,
     }
   )
 }

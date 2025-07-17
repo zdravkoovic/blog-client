@@ -26,6 +26,8 @@ export default function BlogsPage({}: Props){
         // isPlaceholderData
     } = useBlogsByCategory(user?.id, category);
 
+    
+
     const observer = useRef<IntersectionObserver | null>(null);
     const lastBlogElementRef = useCallback(
         (node: HTMLDivElement) => {
